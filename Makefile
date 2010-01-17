@@ -1,8 +1,11 @@
 CXXFLAGS = -g
-TARGETS = sm-core.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis
+TARGETS = sm-core.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis core.sm
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
+
+%.sm: %.src
+	./sm-compile $<
 
 sm-run: sm-core.o sm-util.o sm-run.cpp
 
@@ -27,6 +30,7 @@ check: all
 	./sm-run forward-goto.sm
 	./sm-go yo.src
 	./sm-go func.src
+	./sm-run core.sm
 
 clean:
 	rm -f $(TARGETS) *.stackdump *.sm
