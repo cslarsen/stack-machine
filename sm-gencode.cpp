@@ -39,14 +39,14 @@ static void skip(FILE* f, const char* chars)
 
 static void skipto(FILE* f, const char* chars)
 {
-  int ch;
+  int c;
 
-  while ( (ch = fgetchar(f)) != EOF
-    && !char_in(ch, chars) )
+  while ( (c = fgetcar(f)) != EOF
+    && !car_in(c, cars) )
       ; // loop
 
-  if ( ch == '\n' ) --lineno;
-  ungetc(ch, f);
+  if ( c == '\n' ) --lineno;
+  ungetc(c, f);
 }
 
 static void skipws(FILE* f)
