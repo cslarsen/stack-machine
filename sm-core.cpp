@@ -48,6 +48,7 @@ const char* OpStr[] = {
   "PUSHIP",
   "POPIP",
   "DROPIP",
+  "COPML",
   "NOP_END"
 };
 
@@ -163,7 +164,7 @@ int machine_t::run(int32_t start_address)
   ip = start_address;
 
   while(running)
-    eval(static_cast<Op>(memory[ip]));
+    exec(static_cast<Op>(memory[ip]));
 }
 
 void machine_t::instr_nop()
@@ -207,6 +208,12 @@ void machine_t::instr_not()
   // todo: this probably does not
   //       work as intended
   push(!pop());
+  next();
+}
+
+void machine_t::instr_compl()
+{
+  push(~pop());
   next();
 }
 
@@ -347,34 +354,34 @@ void machine_t::instr_rol3()
   next();
 }
 
-void machine_t::eval(Op op)
+void machine_t::exec(Op operation)
 {
-  int32_t a=NOP, b=NOP, c=NOP;
-
-  switch(op) {
-  case NOP:    instr_nop();    break;
-  case ADD:    instr_add();    break;
-  case SUB:    instr_sub();    break;
-  case AND:    instr_and();    break;
-  case OR:     instr_or();     break;
-  case XOR:    instr_xor();    break;
-  case NOT:    instr_not();    break;
-  case IN:     instr_in();     break;
-  case OUT:    instr_out();    break;
-  case OUTNUM: instr_outnum(); break;
-  case LOAD:   instr_load();   break;
-  case STOR:   instr_stor();   break;
-  case JMP:    instr_jmp();    break;
-  case JZ:     instr_jz();     break;
-  case DROP:   instr_drop();   break;
-  case POPIP:  instr_popip();  break;
-  case DROPIP: instr_dropip(); break;
-  case JNZ:    instr_jnz();    break;
-  case PUSH:   instr_push();   break;
-  case PUSHIP: instr_puship(); break;
-  case DUP:    instr_dup();    break;
-  case SWAP:   instr_swap();   break;
-  case ROL3:   instr_rol3();   break;
+  switch(operation) {
+  default:     error("Unknown instruction");
+  case NOP:    instr_nop(); break;
+  case ADD:    instr_add(); break;
+  case SUB:    instr_sub(); break;
+  case AND:    instr_and(); break;
+  case OR:     instr_or(); break;
+  case XOR:    instr_xor(); break;
+  case NOT:    instr_not(); break;
+  case IN:     instr_in(); break;
+  case OUT:    instr_out(); break;    
+  case OUTNUM: instr_outnum(); break; 
+  case LOAD:   instr_load(); break;   
+  case STOR:   instr_stor(); break;   
+  case JMP:    instr_jmp(); break;    
+  case JZ:     instr_jz(); break;     
+  case DROP:   instr_drop(); break;   
+  case POPIP:  instr_popip(); break;  
+  case DROPIP: instr_dropip(); break; 
+  case JNZ:    instr_jnz(); break;    
+  case PUSH:   instr_push(); break;   
+  case PUSHIP: instr_puship(); break; 
+  case DUP:    instr_dup(); break;    
+  case SWAP:   instr_swap(); break;   
+  case ROL3:   instr_rol3(); break;
+  case COMPL:  instr_compl(); break;
   }
 }
 

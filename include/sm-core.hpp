@@ -43,7 +43,8 @@ enum Op {
   PUSHIP, // push a in IP stack
   POPIP,  // pop IP stack to current IP, effectively performing a jump
   DROPIP, // pop IP, but do not jump
-  NOP_END // placeholder for end of enum
+  COMPL,  // pop a, push the complement of a
+  NOP_END // placeholder for end of enum; MUST BE LAST
 };
 
 extern const char* OpStr[];
@@ -115,10 +116,10 @@ public:
   int32_t popip();
   void check_bounds(int32_t n, const char* msg) const; 
   void next();
-  void load(Op op);
+  void load(Op);
   void load(int32_t n);
   int run(int32_t start_address = 0);
-  void eval(Op op);
+  void exec(Op);
   int32_t* find_end() const;
   void load_image(FILE* f);
   void save_image(FILE* f) const;
@@ -164,6 +165,7 @@ public:
   void instr_dup();    
   void instr_swap();   
   void instr_rol3();   
+  void instr_compl();
 };
 
 #endif

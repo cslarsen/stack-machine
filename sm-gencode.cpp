@@ -41,8 +41,8 @@ static void skipto(FILE* f, const char* chars)
 {
   int c;
 
-  while ( (c = fgetcar(f)) != EOF
-    && !car_in(c, cars) )
+  while ( (c = fgetchar(f)) != EOF
+    && !char_in(c, chars) )
       ; // loop
 
   if ( c == '\n' ) --lineno;
