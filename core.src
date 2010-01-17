@@ -1,0 +1,116 @@
+; Some helpful functions that can be implemented
+; by primitives
+
+&main jmp
+
+no-op:  ; same as nop
+  0     ; push arbitrary value
+  drop  ; ... then pop ip
+  popip
+
+_swap:          ; ( a b -- b a)
+  swap-a: nop   ; placeholder for a
+  swap-b: nop   ; placeholder for b
+  load &swap-b  ; pop to b
+  load &swap-a  ; pop to a
+  push &swap-a  ; push a
+  push &swap-b  ; push b
+  popip
+
++:              ; ( a b -- (a+b) )
+  add           ; 32-bit native addition
+  popip
+
+-:              ; ( a b -- (b-a) )
+  sub           ; 32-bit native subtraction
+  popip
+
+*:              ; ( a b -- (a*b) )
+  mul           ; 32-bit native multiplication
+  popip
+
+-1:             ; ( a -- (a-1))
+  1 swap sub
+  popip
+
++1:             ; ( a -- (a+1))
+  1 add
+  popip
+
+mul:            ; ( a b -- (a*b) )
+  mul-res: nop  ; placeholder for result
+  mul-cnt: nop  ; placeholder for counter
+  mul-num: nop
+
+  &mul-cnt stor ; b to cnt
+  dup
+  &mul-res stor ; a to res
+  &mul-num stor ; and to num
+
+  mul-loop:
+    ; calculate res += a
+    &mul-res load
+    &mul-num load +
+    &mul-res stor
+
+    ; decrement counter
+    &mul-cnt load
+    -1
+    &mul-cnt stor
+
+    ; loop until counter is zero
+    &mul-cnt load
+    &mul-loop swap -1 jnz
+
+  &mul-res load
+  popip
+
+_&:             ; ( a b -- (a AND b) )
+  and           ; 32-bit bitwise AND operation
+  popip
+
+|:              ; ( a b -- (a OR b) )
+  or            ; 32-bit bitwise OR operation
+  popip
+
+^:              ; ( a b -- (a XOR b) )
+  xor           ; 32-bit bitwise EXCLUSIVE OR operation
+  popip
+
+~:              ; ( a -- complement of a )
+  not           ; 32-bit bitwise COMPLEMENT OF A
+  popip
+
+<:              ; ( -- a )
+  in            ; read 8-bit to LSB of 32-bit value from input stream
+  popip
+
+>:              ; ( a -- )
+  out           ; write 8-bit to LSB of 32-bit value to output stream
+  popip
+
+@:              ; ( address -- value at address )
+  load
+  popip
+
+main:
+  1 outnum '+' out
+  2 outnum '+' out
+  3 outnum '+' out
+  4 outnum '+' out
+  5 outnum '=' out
+
+  1 2 3 4 5
+         +
+       +
+     +
+   +
+  outnum ; should be 15
+  '\n' out
+
+  6 outnum '*' out
+  7 outnum '=' out
+  6 7 * outnum ; should be 42
+  '\n' out
+
+  halt
