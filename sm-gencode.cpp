@@ -163,6 +163,7 @@ bool ishalt(const char* s)
 machine_t compile(FILE* f, void (*compile_error)(const char* message))
 {
   machine_t m;
+  lineno = 1;
 
   // store CODE POINTS that will later
   // be filled with LABEL ADDRESSES
