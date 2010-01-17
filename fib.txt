@@ -3,7 +3,7 @@
 ; Our word size is only 32-bits, so we can't
 ; count very far.
 
-; Program starts as main, so jump there
+; Program starts at main, so jump there
 
 &main jmp
 
