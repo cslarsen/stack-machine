@@ -4,7 +4,7 @@ TARGETS = sm-core.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis core.s
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
 
-%.sm: %.src
+%.sm: tests/%.src
 	./sm-compile $<
 
 sm-run: sm-core.o sm-util.o sm-run.cpp
@@ -16,21 +16,21 @@ sm-dis: sm-core.o sm-util.o sm-dis.cpp
 sm-go: sm-core.o sm-util.o sm-gencode.o sm-go.cpp
 
 check: all
-	./sm-compile hello-world.txt
-	./sm-dis hello-world.sm
-	./sm-run hello-world.sm
-	./sm-run fib.sm | head -20
-	./sm-compile hello.src
-	./sm-run hello.sm
-	./sm-compile hello-world.txt
-	./sm-run hello-world.sm
-	./sm-compile fib.src
-	./sm-run fib.sm
-	./sm-compile forward-goto.src
-	./sm-run forward-goto.sm
-	./sm-go yo.src
-	./sm-go func.src
-	./sm-run core.sm
+	./sm-compile tests/hello-world.txt
+	./sm-dis tests/hello-world.sm
+	./sm-run tests/hello-world.sm
+	./sm-run tests/fib.sm | head -20
+	./sm-compile tests/hello.src
+	./sm-run tests/hello.sm
+	./sm-compile tests/hello-world.txt
+	./sm-run tests/hello-world.sm
+	./sm-compile tests/fib.src
+	./sm-run tests/fib.sm
+	./sm-compile tests/forward-goto.src
+	./sm-run tests/forward-goto.sm
+	./sm-go tests/yo.src
+	./sm-go tests/func.src
+	./sm-run tests/core.sm
 
 clean:
-	rm -f $(TARGETS) *.stackdump *.sm
+	rm -f $(TARGETS) *.stackdump tests/*.sm
