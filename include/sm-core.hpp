@@ -116,6 +116,7 @@ public:
   int32_t popip();
   void check_bounds(int32_t n, const char* msg) const; 
   void next();
+  void prev();
   void load(Op);
   void load(int32_t n);
   int run(int32_t start_address = 0);

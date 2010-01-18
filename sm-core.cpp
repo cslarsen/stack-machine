@@ -144,7 +144,15 @@ void machine_t::next()
   ip += sizeof(int32_t);
 
   if ( ip >= memsize )
-    ip = 0; // todo: or halt?
+    ip = 0; // TODO: Halt instead of wrap-around?
+}
+
+void machine_t::prev()
+{
+  if ( ip == 0 )
+    error("prev() reached zero");
+
+  ip -= sizeof(int32_t);
 }
 
 void machine_t::load(Op op)
@@ -180,6 +188,28 @@ void machine_t::instr_add()
 
 void machine_t::instr_sub()
 {
+  /*
+   * This operation is not primitive.  It can
+   * be implemented by adding the minuend to
+   * the two's complement of the subtrahend:
+   *
+   * SUB: ; ( a b -- (b-a))
+   *   swap  ; b a
+   *   compl ; b ~a
+   *   1 add ; b (~a+1), or b -a
+   *   add   ; b-a
+   *   popip
+   *
+   * The problem is that IF the underlying
+   * architecture does not use two's complement
+   * to represent negative values, stuff like
+   * printing will fail miserably (at least in
+   * the current implementation on top of C).
+   */
+
+  // TODO: Consider reversing the operands for SUB
+  //       (it's currently unnatural)
+
   int32_t tos = pop();
   push(tos - pop());
   next();
@@ -205,8 +235,7 @@ void machine_t::instr_xor()
 
 void machine_t::instr_not()
 {
-  // todo: this probably does not
-  //       work as intended
+  // TODO: this probably does not work as intended
   push(!pop());
   next();
 }
@@ -219,6 +248,14 @@ void machine_t::instr_compl()
 
 void machine_t::instr_in()
 {
+  /*
+   * The IN/OUT functions should be implemented
+   * using something akin to x86 INT or SYSCALL or
+   * similar.  E.g.:
+   *
+   * 123 SYSCALL ; exec system call 123
+   *
+   */
   push(getc(fin));
   next();
 }
@@ -254,6 +291,20 @@ void machine_t::instr_stor()
 
 void machine_t::instr_jmp()
 {
+  /*
+   * This function is not primitive.
+   * If we have e.g. JZ, we can always
+   * do "0 JZ" to perform the jump.
+   *
+   */
+
+  // TODO: Implement as library function
+
+  /*
+  push(0);
+  instr_jz();
+  */
+
   int32_t a = pop();
   check_bounds(a, "JMP");  
 
@@ -299,6 +350,21 @@ void machine_t::instr_dropip()
 
 void machine_t::instr_jnz()
 {
+  /*
+   * Only one of JNZ and JZ is needed as
+   * a primitive -- one can be implemented
+   * in terms of the other with a negation
+   * of the TOS.
+   *
+   */
+/*
+  // TODO: Fix and use below
+  instr_puship();
+  instr_compl();
+  instr_popip();
+  instr_jz();
+*/
+
   int32_t a = pop();
   int32_t b = pop();
 
@@ -326,6 +392,20 @@ void machine_t::instr_puship()
 
 void machine_t::instr_dup()
 {
+  /*
+   * This function is not primitive.
+   * It can be replaced with a "function":
+   *
+   * ; ( a -- a a )
+   * dup:  nop       ; placeholder <- nop
+   *       &dup stor ; placeholder <- a
+   *       &dup load ; tos <- a
+   *       &dup load ; tos <- a
+   *       popip
+   */
+
+  // TODO: Implement as library function
+
   int32_t a = pop();
   push(a);
   push(a);
@@ -334,6 +414,25 @@ void machine_t::instr_dup()
 
 void machine_t::instr_swap()
 {
+  /*
+   * This function is not primitive.
+   * It can be replaced with a "function",
+   * something like:
+   *
+   * ; ( a b -- b a )
+   * swap:
+   *   swap-b: nop  ; placeholder
+   *   swap-a: nop  ; placeholder
+   *   &swap-b stor ; swap-b <- b
+   *   &swap-a stor ; swap-a <- a
+   *   &swap-b load ; tos <- a
+   *   &swap-a load ; tos <- b
+   *   popip
+   *
+   */
+
+  // TODO: Implement as library function
+
   // a, b -- b, a
   int32_t b = pop();
   int32_t a = pop();
@@ -344,6 +443,23 @@ void machine_t::instr_swap()
 
 void machine_t::instr_rol3()
 {
+  /*
+   * This function is not primitive.
+   * It can be replaced with "functions",
+   * something like:
+   *
+   * rol3:
+   *   rol3-var: nop  ; stack = a b c
+   *   &rol3-var stor ; stack = a b, var = c
+   *   swap           ; stack = b a, var = c
+   *   &rol3-var load ; stack = b a c
+   *   swap           ; stack = b c a
+   *   popip
+   *
+   */
+
+  // TODO: Implement as library function
+
   // abc -> bca
   int32_t c = pop(); // TOS
   int32_t b = pop();
@@ -357,31 +473,49 @@ void machine_t::instr_rol3()
 void machine_t::exec(Op operation)
 {
   switch(operation) {
-  default:     error("Unknown instruction");
-  case NOP:    instr_nop(); break;
-  case ADD:    instr_add(); break;
-  case SUB:    instr_sub(); break;
-  case AND:    instr_and(); break;
-  case OR:     instr_or(); break;
-  case XOR:    instr_xor(); break;
-  case NOT:    instr_not(); break;
-  case IN:     instr_in(); break;
-  case OUT:    instr_out(); break;    
-  case OUTNUM: instr_outnum(); break; 
-  case LOAD:   instr_load(); break;   
-  case STOR:   instr_stor(); break;   
-  case JMP:    instr_jmp(); break;    
-  case JZ:     instr_jz(); break;     
-  case DROP:   instr_drop(); break;   
-  case POPIP:  instr_popip(); break;  
-  case DROPIP: instr_dropip(); break; 
-  case JNZ:    instr_jnz(); break;    
-  case PUSH:   instr_push(); break;   
+  default:     error("Unknown instruction"); break;
+  case NOP:    instr_nop();    break;
+
+  // Strictly speaking, SUB can be implemented
+  // by ADDing the minuend with the two's complement
+  // of the subtrahend -- but that's not necessarily
+  // portable down to native code
+
+  case ADD:    instr_add();    break;
+  case SUB:    instr_sub();    break; // non-primitive
+
+  // Strictly speaking, all but NOT and AND are
+  // non-primitive (or some other combination of
+  // two operations)
+
+  case AND:    instr_and();    break;
+  case OR:     instr_or();     break;
+  case XOR:    instr_xor();    break;
+  case NOT:    instr_not();    break;
+  case COMPL:  instr_compl();  break;
+
+  // Should be replaced with x86 INT-like operations
+
+  case IN:     instr_in();     break;
+  case OUT:    instr_out();    break;
+
+  case LOAD:   instr_load();   break;   
+  case STOR:   instr_stor();   break;   
+
+  case PUSH:   instr_push();   break;   
+  case DROP:   instr_drop();   break;   
+
   case PUSHIP: instr_puship(); break; 
-  case DUP:    instr_dup(); break;    
-  case SWAP:   instr_swap(); break;   
-  case ROL3:   instr_rol3(); break;
-  case COMPL:  instr_compl(); break;
+  case POPIP:  instr_popip();  break;  
+  case DROPIP: instr_dropip(); break; 
+
+  case JZ:     instr_jz();     break;     
+  case JMP:    instr_jmp();    break; // non-primitive
+  case JNZ:    instr_jnz();    break; // non-primitive
+  case DUP:    instr_dup();    break; // non-primitive
+  case SWAP:   instr_swap();   break; // non-primitive 
+  case ROL3:   instr_rol3();   break; // non-primitive
+  case OUTNUM: instr_outnum(); break; // non-primitive
   }
 }
 
