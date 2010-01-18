@@ -296,14 +296,15 @@ void machine_t::instr_jmp()
    * If we have e.g. JZ, we can always
    * do "0 JZ" to perform the jump.
    *
+   * (Note that this will break the
+   * HALT-idiom)
+   *
    */
 
   // TODO: Implement as library function
 
-  /*
-  push(0);
-  instr_jz();
-  */
+  //push(0);
+  //instr_jz();
 
   int32_t a = pop();
   check_bounds(a, "JMP");  
@@ -356,14 +357,15 @@ void machine_t::instr_jnz()
    * in terms of the other with a negation
    * of the TOS.
    *
+   * (Note that this will break the HALT-idiom)
    */
-/*
-  // TODO: Fix and use below
+
+  /*
   instr_puship();
   instr_compl();
   instr_popip();
   instr_jz();
-*/
+  */
 
   int32_t a = pop();
   int32_t b = pop();
