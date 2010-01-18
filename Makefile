@@ -1,4 +1,4 @@
-CXXFLAGS = -g
+CXXFLAGS = -g -Iinclude
 TARGETS = sm-core.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis core.sm
 
 all: $(TARGETS)
