@@ -10,37 +10,31 @@ void error(const char* s)
   exit(1);
 }
 
-std::string chext(const std::string& s, const std::string& ext)
+std::string basename(const std::string& s)
 {
-  std::string::size_type p;
-
-  if ( (p = s.rfind(".")) != std::string::npos )
-    return s.substr(0, p) + ext;
-  else
-    return s + ext;
+  std::string::size_type p = s.rfind('.');
+  return p == std::string::npos ? s : s.substr(0, p);
 }
 
 int main(int argc, char** argv)
 {
-  if ( argc < 2 )
-    error("Usage: sm-compile [ filename(s) ]");
-
   try {
+    if ( argc < 2 )
+      error("Usage: sm-compile [ filename(s) ]");
+
     for ( int n=1; n<argc; ++n ) {
       fprintf(stderr, "Compiling %s", argv[1]);
       fflush(stderr);
 
-      machine_t m = compile(fileptr(fopen(argv[1], "rt")), error);
-      std::string out = chext(argv[1], ".sm");
-      m.save_image(fileptr(fopen(out.c_str(), "wb")));
-      
-      fprintf(stderr, ", saved bytecode to %s\n", out.c_str());
-      fflush(stderr);
+      machine_t m;
+      m = compile(fileptr(fopen(argv[1], "rt")), error);
+      m.save_image( fileptr(
+        fopen((basename(argv[1]) + ".sm").c_str(), "wb")));
     }
+
+    return 0;
   }
   catch(const std::exception& e) {
     error(e.what());
   }
-
-  return 0;
 }
