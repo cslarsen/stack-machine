@@ -105,7 +105,7 @@ bool islabel(const char* token)
 
 bool iscomment(const char* token)
 {
-  return token[0] == ';';
+  return *token == ';';
 }
 
 Op tok2op(const char* token)
@@ -126,6 +126,7 @@ bool isnumber(const char* s)
   while ( *s )
     if ( !isdigit(*s++) )
       return false;
+
   return true;
 }
 
@@ -163,7 +164,7 @@ char to_ord(const char* s, void (*compile_error)(const char* message))
 
 bool islabel_ref(const char* s)
 {
-  return s[0] == '&';
+  return *s == '&';
 }
 
 int32_t to_literal(const char* s, void (*compile_error)(const char* msg))
@@ -180,82 +181,96 @@ int32_t to_literal(const char* s, void (*compile_error)(const char* msg))
 
 bool ishalt(const char* s)
 {
-  return upper(s) == "HALT";
+  return *s == '\0' || upper(s) == "HALT";
+}
+
+void check_label_name(const char* label, void (*compile_error)(const char*))
+{
+  if ( upper(label) == "HERE" )
+    compile_error("Label HERE is reserved");
+}
+
+void compile_literal(
+  machine_t& m,
+  const char* t,
+  std::vector<label_t>& forwards,
+  void (*compile_error)(const char*))
+{
+  if ( islabel_ref(t) ) {
+    int32_t label_adr = m.get_label_address(t+1);
+
+    m.load(PUSH);
+
+    // if label not found, mark it for update
+    if ( label_adr == -1 ) {
+      check_label_name(t+1, compile_error);
+      forwards.push_back(label_t(t+1, m.pos()));
+    }
+
+    m.load(label_adr);
+
+  } else {
+    int32_t literal = to_literal(t, compile_error);
+
+    if ( literal != -1 ) {
+      // Perform implicit push (like Forth/Postscript)
+      m.load(PUSH);
+      m.load(literal);
+    } else {
+      // Treat unknown literal as function call
+
+      // Push return address (4*wordsize -> continue after the last JMP here)
+      m.load(PUSHIP);
+      m.load(m.pos()+4*m.wordsize());
+
+      // Push destination address, to be updated later
+      m.load(PUSH);
+      forwards.push_back(label_t(t, m.pos()));
+      m.load(literal);
+
+      // Perform the jump to the function
+      m.load(JMP);
+
+      // This is the point we'll return to with POPIP (m.pos()+4*m.wordsize())
+    }
+  }
+}
+
+void update_forward_jumps(
+  machine_t& m,
+  std::vector<label_t>& forwards,
+  void (*compile_error)(const char*))
+{
+  int32_t address;
+
+  for ( int n=0; n<forwards.size(); ++n ) {
+    const char* label = forwards[n].name.c_str();
+    int32_t address = m.get_label_address(label);
+
+    if ( address == -1 )
+      compile_error(format("Code label '%s' not found", forwards[n].name.c_str()).c_str());
+
+    // update label jump to address
+    m.set_mem(forwards[n].pos, address);
+  }
 }
 
 machine_t compile(FILE* f, void (*compile_error)(const char* message))
 {
   machine_t m;
-  lineno = 1;
-
-  // store CODE POINTS that will later
-  // be filled with LABEL ADDRESSES
   std::vector<label_t> forwards;
+  lineno = 1;
 
   while ( !feof(f) ) {
     skip(f, WHITESPACE);
+
     const char* t = token(f);
 
-    if ( t[0] == '\0' ) {
-      m.load_halt();
-    } else if ( iscomment(t) ) {
-      skip(f, ALL_BUT_LINEFEED);
-    } else if ( ishalt(t) ) {
-      m.load_halt();
-    } else if ( isliteral(t) ) {
-      // e.g. 123, 'a', '\n'
-      // convert literal to number and push it on the stack
-      int32_t literal;
-
-      if ( islabel_ref(t) ) {
-        literal = m.get_label_address(t+1);
-
-        m.load(PUSH);
-        if ( literal == -1 ) {
-          // label was not found,
-          // store current address and update it later on
-
-          if ( upper(t+1) == "HERE" )
-            compile_error("Label HERE is reserved");
-
-          forwards.push_back(label_t(t+1, m.pos()));
-        }
-        m.load(literal);
-      } else {
-        literal = to_literal(t, compile_error);
-
-        if ( literal == -1 ) {
-          // Unknown literal, but it could be a function
-          // reference ... meaning we should call it
-
-          // First push return address
-          // then push destination function address (and mark it for filling in later)
-          // then jump
-
-          // Push return address (4*wordsize -> continue after the last JMP here)
-          m.load(PUSHIP);
-          m.load(m.pos()+4*m.wordsize());
-
-          // Push destination address, which we will
-          // fill out later with `forwards´
-          m.load(PUSH);
-          forwards.push_back(label_t(t, m.pos()));
-          m.load(literal);
-
-          // Perform the jump
-          m.load(JMP);
-
-          // 4*wordsize is here -- the point we'll return with POPIP
-
-        } else {
-          // Perform implicit push of words, just like Forth, Postscript, etc.
-          m.load(PUSH);
-          m.load(literal);
-        }
-      }
-    } else if ( islabel(t) ) {
-      m.addlabel(t, m.pos());
-    } else {
+         if ( ishalt(t) )    m.load_halt();
+    else if ( iscomment(t) ) skip(f, ALL_BUT_LINEFEED);
+    else if ( isliteral(t) ) compile_literal(m, t, forwards, compile_error);
+    else if ( islabel(t) )   m.addlabel(t, m.pos());
+    else {
       Op op = tok2op(t);
 
       if ( op == NOP_END )
@@ -265,20 +280,10 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
     }
   }
 
-  // Add a halt instruction, just in case
+  // Add HALT-idiom, just in case
   m.load_halt();
 
-  // Update all forwards jumps, since we now know all
-  // code labels.
-  for ( int n=0; n<forwards.size(); ++n ) {
-    int32_t adr = m.get_label_address(forwards[n].name.c_str());
+  update_forward_jumps(m, forwards, compile_error);
 
-    if ( adr == -1 )
-      compile_error(format("Code label '%s' not found", forwards[n].name.c_str()).c_str());
-
-    // update label jump to address
-    m.set_mem(forwards[n].pos, adr);
-  }
- 
   return m;
 }
