@@ -33,21 +33,6 @@ static const char TRN0[256] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
-// "\n"
-static const char ALL_BUT_LINEFEED[256] = {
-  1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-};
-
 int get_lineno()
 {
   return lineno;
@@ -236,6 +221,13 @@ void compile_literal(
   }
 }
 
+void skip_line(FILE* f)
+{
+  int c;
+  while ( (c = fgetchar(f)) != EOF && c != '\n' )
+    ; // looooooop
+}
+
 void update_forward_jumps(
   machine_t& m,
   std::vector<label_t>& forwards,
@@ -267,7 +259,7 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
     const char* t = token(f);
 
          if ( ishalt(t) )    m.load_halt();
-    else if ( iscomment(t) ) skip(f, ALL_BUT_LINEFEED);
+    else if ( iscomment(t) ) skip_line(f);
     else if ( isliteral(t) ) compile_literal(m, t, forwards, compile_error);
     else if ( islabel(t) )   m.addlabel(t, m.pos());
     else {
