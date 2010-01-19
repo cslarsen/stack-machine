@@ -1,5 +1,5 @@
 CXXFLAGS = -g -Iinclude
-TARGETS = sm-core.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis core.sm
+TARGETS = sm-core.o parser.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis core.sm
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
@@ -9,11 +9,11 @@ all: $(TARGETS)
 
 sm-run: sm-core.o sm-util.o sm-run.cpp
 
-sm-compile: sm-core.o sm-util.o sm-gencode.o sm-compile.cpp
+sm-compile: sm-core.o sm-util.o parser.o sm-gencode.o sm-compile.cpp
 
 sm-dis: sm-core.o sm-util.o sm-dis.cpp
 
-sm-go: sm-core.o sm-util.o sm-gencode.o sm-go.cpp
+sm-go: sm-core.o sm-util.o parser.o sm-gencode.o sm-go.cpp
 
 check: all
 	./sm-compile tests/hello-world.txt

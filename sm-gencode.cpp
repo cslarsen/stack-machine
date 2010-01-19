@@ -1,82 +1,6 @@
 #include "sm-gencode.hpp"
 #include "sm-util.hpp"
-
-class Parser
-{
-  FILE* f;
-  int lineno;
-
-  int update_lineno(int c)
-  {
-    if ( c == '\n' )
-      ++lineno;
-
-    return c;
-  }
-
-  int fgetchar()
-  {
-    return update_lineno(fgetc(f));
-  }
-
-  void move_back(int c)
-  {
-    if ( c == '\n' )
-      --lineno;
-
-    ungetc(c, f);
-  }
-
-  void skip_whitespace()
-  {
-    int c;
-    while ( (c = fgetchar()) != EOF && isspace(c) );
-    move_back(c);
-  }
-
-public:
-  Parser(FILE* file) : f(file), lineno(1)
-  {
-  }
-
-  int get_lineno() const
-  {
-    return lineno;
-  }
-
-  const char* next_token()
-  {
-    // TODO: Fix maximum size of identifiers is 255 characters.
-    static char tok[256];
-
-    char* p = &tok[0];
-    int c;
-
-    tok[0] = '\0';
-
-    if ( feof(f) )
-      return NULL;
-
-    skip_whitespace();
-
-    while ( (c = fgetchar()) != EOF
-        && !isspace(c)
-        && p-tok<sizeof(tok) )
-    {
-        *p++ = c;
-    }
-
-    *p = '\0';
-    return tok;
-  }
-
-  void skip_line()
-  {
-    int c;
-    while ( (c = fgetchar()) != EOF && c != '\n' )
-      ; // loop
-  }
-};
+#include "parser.hpp"
 
 bool islabel(const char* token)
 {
@@ -239,26 +163,26 @@ void update_forward_jumps(
   }
 }
 
-machine_t compile(FILE* fptr, void (*compile_error)(const char* message))
+machine_t compile(FILE* f, void (*compile_error)(const char* message))
 {
   machine_t m;
   std::vector<label_t> forwards;
 
-  Parser parser(fptr);
+  parser p(f);
 
   for(;;) {
-    const char* t = parser.next_token();
+    const char* s = p.next_token();
 
-         if ( t == NULL )    break;
-    else if ( ishalt(t) )    m.load_halt();
-    else if ( iscomment(t) ) parser.skip_line();
-    else if ( isliteral(t) ) compile_literal(m, t, forwards, compile_error);
-    else if ( islabel(t) )   m.addlabel(t, m.pos());
+         if ( s == NULL )    break;
+    else if ( ishalt(s) )    m.load_halt();
+    else if ( iscomment(s) ) p.skip_line();
+    else if ( isliteral(s) ) compile_literal(m, s, forwards, compile_error);
+    else if ( islabel(s) )   m.addlabel(s, m.pos());
     else {
-      Op op = tok2op(t);
+      Op op = tok2op(s);
 
       if ( op == NOP_END )
-        compile_error(format("Unknown operation on line %d", parser.get_lineno()).c_str());
+        compile_error(format("Unknown operation on line %d", p.get_lineno()).c_str());
 
       m.load(op);
     }
