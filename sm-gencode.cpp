@@ -1,62 +1,82 @@
 #include "sm-gencode.hpp"
 #include "sm-util.hpp"
 
-static int lineno = 1;
-
-int get_lineno()
+class Parser
 {
-  return lineno;
-}
+  FILE* f;
+  int lineno;
 
-static int update_lineno(int c)
-{
-  if ( c == '\n' )
-    ++lineno;
-
-  return c;
-}
-
-static int fgetchar(FILE* f)
-{
-  return update_lineno(fgetc(f));
-}
-
-static void move_back(FILE *f, int c)
-{
-  if ( c == '\n' )
-    --lineno;
-
-  ungetc(c, f);
-}
-
-static void skip_whitespace(FILE* f)
-{
-  int c;
-  while ( (c = fgetchar(f)) != EOF && isspace(c) );
-  move_back(f, c);
-}
-
-static const char* token(FILE* f)
-{
-  // TODO: Fix maximum size of identifiers is 255 characters.
-  static char tok[256];
-
-  char* p = &tok[0];
-  int c;
-
-  tok[0] = '\0';
-  skip_whitespace(f);
-
-  while ( (c = fgetchar(f)) != EOF
-      && !isspace(c)
-      && p-tok<sizeof(tok) )
+  int update_lineno(int c)
   {
-      *p++ = c;
+    if ( c == '\n' )
+      ++lineno;
+
+    return c;
   }
 
-  *p = '\0';
-  return tok;
-}
+  int fgetchar()
+  {
+    return update_lineno(fgetc(f));
+  }
+
+  void move_back(int c)
+  {
+    if ( c == '\n' )
+      --lineno;
+
+    ungetc(c, f);
+  }
+
+  void skip_whitespace()
+  {
+    int c;
+    while ( (c = fgetchar()) != EOF && isspace(c) );
+    move_back(c);
+  }
+
+public:
+  Parser(FILE* file) : f(file), lineno(1)
+  {
+  }
+
+  int get_lineno() const
+  {
+    return lineno;
+  }
+
+  const char* next_token()
+  {
+    // TODO: Fix maximum size of identifiers is 255 characters.
+    static char tok[256];
+
+    char* p = &tok[0];
+    int c;
+
+    tok[0] = '\0';
+
+    if ( feof(f) )
+      return NULL;
+
+    skip_whitespace();
+
+    while ( (c = fgetchar()) != EOF
+        && !isspace(c)
+        && p-tok<sizeof(tok) )
+    {
+        *p++ = c;
+    }
+
+    *p = '\0';
+    return tok;
+  }
+
+  void skip_line()
+  {
+    int c;
+    while ( (c = fgetchar()) != EOF && c != '\n' )
+      ; // loop
+  }
+};
 
 bool islabel(const char* token)
 {
@@ -142,7 +162,10 @@ int32_t to_literal(const char* s, void (*compile_error)(const char* msg))
 
 bool ishalt(const char* s)
 {
-  return *s == '\0' || upper(s) == "HALT";
+  if ( s == NULL )
+    return true;
+
+  return *s=='\0' || upper(s)=="HALT";
 }
 
 void check_label_name(const char* label, void (*compile_error)(const char*))
@@ -197,13 +220,6 @@ void compile_literal(
   }
 }
 
-void skip_line(FILE* f)
-{
-  int c;
-  while ( (c = fgetchar(f)) != EOF && c != '\n' )
-    ; // looooooop
-}
-
 void update_forward_jumps(
   machine_t& m,
   std::vector<label_t>& forwards,
@@ -223,26 +239,26 @@ void update_forward_jumps(
   }
 }
 
-machine_t compile(FILE* f, void (*compile_error)(const char* message))
+machine_t compile(FILE* fptr, void (*compile_error)(const char* message))
 {
   machine_t m;
   std::vector<label_t> forwards;
-  lineno = 1;
 
-  while ( !feof(f) ) {
-    skip_whitespace(f);
+  Parser parser(fptr);
 
-    const char* t = token(f);
+  for(;;) {
+    const char* t = parser.next_token();
 
-         if ( ishalt(t) )    m.load_halt();
-    else if ( iscomment(t) ) skip_line(f);
+         if ( t == NULL )    break;
+    else if ( ishalt(t) )    m.load_halt();
+    else if ( iscomment(t) ) parser.skip_line();
     else if ( isliteral(t) ) compile_literal(m, t, forwards, compile_error);
     else if ( islabel(t) )   m.addlabel(t, m.pos());
     else {
       Op op = tok2op(t);
 
       if ( op == NOP_END )
-        compile_error(format("Unknown operation on line %d", get_lineno()).c_str());
+        compile_error(format("Unknown operation on line %d", parser.get_lineno()).c_str());
 
       m.load(op);
     }
