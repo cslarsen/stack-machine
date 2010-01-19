@@ -1,13 +1,13 @@
+/*
+ * Made in 2010 by Christian Stigen Larsen
+ * http://csl.sublevel3.org
+ *
+ * Placed in the public domain by the author.
+ *
+ */
+
 #include <stdio.h>
 #include <string>
-
-class fileptr {
-  FILE* f;
-public:
-  fileptr(FILE *file);
-  ~fileptr();
-  operator FILE*() const;
-};
 
 std::string upper(const std::string& s);
 std::string lower(const std::string& s);

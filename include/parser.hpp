@@ -1,4 +1,15 @@
-#include <stdio.h>
+/*
+ * Made in 2010 by Christian Stigen Larsen
+ * http://csl.sublevel3.org
+ *
+ * Placed in the public domain by the author.
+ *
+ */
+
+#include <string>
+
+#ifndef INC_PARSER_HPP
+#define INC_PARSER_HPP
 
 class parser
 {
@@ -12,6 +23,8 @@ class parser
 public:
   parser(FILE* f);
   int get_lineno() const;
-  const char* next_token();
+  std::string next_token();
   void skip_line();
 };
+
+#endif

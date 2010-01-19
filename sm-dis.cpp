@@ -1,5 +1,15 @@
+/*
+ * Made in 2010 by Christian Stigen Larsen
+ * http://csl.sublevel3.org
+ *
+ * Placed in the public domain by the author.
+ *
+ */
+
 #include "sm-core.hpp"
 #include "sm-util.hpp"
+#include "machine.hpp"
+#include "fileptr.hpp"
 
 static bool isprintable(char c)
 {

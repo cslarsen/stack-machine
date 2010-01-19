@@ -1,3 +1,11 @@
+/*
+ * Made in 2010 by Christian Stigen Larsen
+ * http://csl.sublevel3.org
+ *
+ * Placed in the public domain by the author.
+ *
+ */
+
 #include <ctype.h>
 #include "parser.hpp"
 
@@ -40,35 +48,21 @@ int parser::get_lineno() const
   return lineno;
 }
 
-const char* parser::next_token()
+std::string parser::next_token()
 {
-  // TODO: Fix maximum size of identifiers is 255 characters.
-  static char tok[256];
-
-  char* p = &tok[0];
   int c;
-
-  tok[0] = '\0';
-
-  if ( feof(f) )
-    return NULL;
+  std::string s;
 
   skip_whitespace();
 
-  while ( (c = fgetchar()) != EOF
-      && !isspace(c)
-      && p-tok<sizeof(tok) )
-  {
-      *p++ = c;
-  }
+  while ( (c = fgetchar()) != EOF && !isspace(c) )
+      s += c;
 
-  *p = '\0';
-  return tok;
+  return s;
 }
 
 void parser::skip_line()
 {
   int c;
-  while ( (c = fgetchar()) != EOF && c != '\n' )
-    ; // loop
+  while ( (c = fgetchar()) != EOF && c != '\n' );
 }

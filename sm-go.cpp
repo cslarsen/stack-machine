@@ -9,13 +9,21 @@
 #include <stdio.h>
 #include "sm-core.hpp"
 #include "sm-util.hpp"
-#include "sm-gencode.hpp"
+#include "fileptr.hpp"
+#include "compiler.hpp"
+
+void compile_and_run(const char* filename)
+{
+  parser p(fileptr(fopen(filename, "rt")));
+  compiler c(p, error);
+  c.get_program().run();
+}
 
 int main(int argc, char** argv)
 {
   try {
     for ( int n=1; n<argc; ++n )
-      compile(fileptr(fopen(argv[n], "rb")), error).run();
+      compile_and_run(argv[n]);
 
     return 0;
   }

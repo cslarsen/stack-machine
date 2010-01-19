@@ -4,20 +4,6 @@
  *
  * Placed in the public domain by the author.
  *
- * This is a very simple stack machine.
- *
- * It's Turing complete, and you can do anything you want
- * with it, as long as you do it within 1 Mb of memory.
- *
- * Currently, the only program it accepts is hardcoded.
- * Program and memory size will be parameters later on.
- *
- * To stop your programs, just loop forever, as in embedded systems;
- * if you jump to the current line, this is understood as an
- * infinite loop and main() will exit.  The code for that is:
- *
- * load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
- *
  */
 
 #include <stdio.h>
@@ -28,6 +14,8 @@
 #include <vector>
 #include "sm-core.hpp"
 #include "sm-util.hpp"
+#include "machine.hpp"
+#include "fileptr.hpp"
 
 static void help()
 {
