@@ -2,7 +2,51 @@
 #include "sm-util.hpp"
 
 static int lineno = 1;
-static const char WHITESPACE[] = "\r\n\t ";
+
+// "\t\n\r "
+static const char WHITESPACE[256] = {
+  0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
+
+// "trn0"
+static const char TRN0[256] = {
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0, 0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
+
+// "\n"
+static const char ALL_BUT_LINEFEED[256] = {
+  1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+};
 
 int get_lineno()
 {
@@ -12,46 +56,25 @@ int get_lineno()
 static int fgetchar(FILE* f)
 {
   int n = fgetc(f);
-  if ( n=='\n' ) ++lineno;
+
+  if ( n=='\n' )
+    ++lineno;
+
   return n;
 }
 
-static bool char_in(char ch, const char* in)
-{
-  while ( *in )
-    if ( *in++ == ch )
-      return true;
-  return false;
-}
-
-static void skip(FILE* f, const char* chars)
-{
-  int ch;
-
-  while ( (ch = fgetchar(f)) != EOF
-    && char_in(ch, chars) )
-      ; // loop
-
-  if ( ch == '\n' )
-    --lineno;
-  ungetc(ch, f);
-}
-
-static void skipto(FILE* f, const char* chars)
+static void skip(FILE* f, const char chars[256])
 {
   int c;
 
   while ( (c = fgetchar(f)) != EOF
-    && !char_in(c, chars) )
+    && chars[c] )
       ; // loop
 
-  if ( c == '\n' ) --lineno;
-  ungetc(c, f);
-}
+  if ( c == '\n' )
+    --lineno;
 
-static void skipws(FILE* f)
-{
-  skip(f, WHITESPACE);
+  ungetc(c, f);
 }
 
 static const char* token(FILE* f)
@@ -61,10 +84,10 @@ static const char* token(FILE* f)
   int ch;
 
   tok[0] = '\0';
-  skipws(f);
+  skip(f, WHITESPACE);
 
   while ( (ch = fgetchar(f)) != EOF
-      && !char_in(ch, WHITESPACE)
+      && !WHITESPACE[ch]
       && p-tok<sizeof(tok) )
   {
       *p++ = ch;
@@ -114,7 +137,7 @@ bool ischar(const char* s)
     return true;
 
   if ( l==4 && s[0]=='\'' && s[3]=='\'' && s[1]=='\\' 
-            && char_in(s[2], "trn0") )
+            && TRN0[s[2]] )
     return true;
 
   return false;
@@ -170,13 +193,13 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
   std::vector<label_t> forwards;
 
   while ( !feof(f) ) {
-    skipws(f);
+    skip(f, WHITESPACE);
     const char* t = token(f);
 
     if ( t[0] == '\0' ) {
       m.load_halt();
     } else if ( iscomment(t) ) {
-      skipto(f, "\n");
+      skip(f, ALL_BUT_LINEFEED);
     } else if ( ishalt(t) ) {
       m.load_halt();
     } else if ( isliteral(t) ) {
