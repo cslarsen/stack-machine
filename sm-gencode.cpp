@@ -3,64 +3,55 @@
 
 static int lineno = 1;
 
-// "\t\n\r "
-static const char WHITESPACE[256] = {
-  0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-};
-
 int get_lineno()
 {
   return lineno;
 }
 
-static int fgetchar(FILE* f)
+static int update_lineno(int c)
 {
-  int n = fgetc(f);
-
-  if ( n=='\n' )
+  if ( c == '\n' )
     ++lineno;
 
-  return n;
+  return c;
 }
 
-static void skip(FILE* f, const char chars[256])
+static int fgetchar(FILE* f)
 {
-  int c;
+  return update_lineno(fgetc(f));
+}
 
-  while ( (c = fgetchar(f)) != EOF
-    && chars[c] )
-      ; // loop
-
+static void move_back(FILE *f, int c)
+{
   if ( c == '\n' )
     --lineno;
 
   ungetc(c, f);
 }
 
+static void skip_whitespace(FILE* f)
+{
+  int c;
+  while ( (c = fgetchar(f)) != EOF && isspace(c) );
+  move_back(f, c);
+}
+
 static const char* token(FILE* f)
 {
+  // TODO: Fix maximum size of identifiers is 255 characters.
   static char tok[256];
+
   char* p = &tok[0];
-  int ch;
+  int c;
 
   tok[0] = '\0';
-  skip(f, WHITESPACE);
+  skip_whitespace(f);
 
-  while ( (ch = fgetchar(f)) != EOF
-      && !WHITESPACE[ch]
+  while ( (c = fgetchar(f)) != EOF
+      && !isspace(c)
       && p-tok<sizeof(tok) )
   {
-      *p++ = ch;
+      *p++ = c;
   }
 
   *p = '\0';
@@ -239,7 +230,7 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
   lineno = 1;
 
   while ( !feof(f) ) {
-    skip(f, WHITESPACE);
+    skip_whitespace(f);
 
     const char* t = token(f);
 
