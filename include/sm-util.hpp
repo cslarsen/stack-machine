@@ -6,7 +6,6 @@
  *
  */
 
-#include <stdio.h>
 #include <string>
 
 std::string upper(const std::string& s);
