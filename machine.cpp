@@ -6,8 +6,9 @@
  *
  */
 
-#include "sm-util.hpp"
 #include "machine.hpp"
+#include "upper.hpp"
+#include "error.hpp"
 
 machine_t::machine_t(const machine_t& p) :
   stack(p.stack),

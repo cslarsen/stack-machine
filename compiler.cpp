@@ -6,10 +6,10 @@
  *
  */
 
-#include "sm-util.hpp"
 #include "compiler.hpp"
 #include "parser.hpp"
 #include "machine.hpp"
+#include "upper.hpp"
 
 void compiler::error(const std::string& s)
 {

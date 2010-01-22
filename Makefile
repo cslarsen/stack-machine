@@ -1,5 +1,5 @@
 CXXFLAGS = -g -Iinclude
-TARGETS = instructions.o parser.o sm-util.o fileptr.o machine.o compiler.o sm smr smc smd
+TARGETS = instructions.o parser.o error.o upper.o fileptr.o machine.o compiler.o sm smr smc smd
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
@@ -7,13 +7,13 @@ all: $(TARGETS)
 %.sm: tests/%.src
 	./smc $<
 
-smr: instructions.o machine.o sm-util.o fileptr.o smr.cpp
+smr: instructions.o machine.o upper.o error.o fileptr.o smr.cpp
 
-smc: instructions.o machine.o sm-util.o fileptr.o parser.o compiler.o smc.cpp
+smc: instructions.o machine.o upper.o error.o fileptr.o parser.o compiler.o smc.cpp
 
-smd: instructions.o machine.o sm-util.o fileptr.o smd.cpp
+smd: instructions.o machine.o upper.o error.o fileptr.o smd.cpp
 
-sm: instructions.o machine.o sm-util.o fileptr.o parser.o compiler.o sm.cpp
+sm: instructions.o machine.o upper.o error.o fileptr.o parser.o compiler.o sm.cpp
 
 check: all
 	./smc tests/hello-world.txt

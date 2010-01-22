@@ -8,8 +8,8 @@
 
 #include <stdio.h>
 #include "instructions.hpp"
-#include "sm-util.hpp"
 #include "machine.hpp"
+#include "upper.hpp"
 
 const char* OpStr[] = {
   "NOP",

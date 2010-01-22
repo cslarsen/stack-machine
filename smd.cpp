@@ -9,9 +9,9 @@
  */
 
 #include "instructions.hpp"
-#include "sm-util.hpp"
 #include "machine.hpp"
 #include "fileptr.hpp"
+#include "error.hpp"
 
 static bool isprintable(char c)
 {

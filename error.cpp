@@ -7,19 +7,8 @@
  */
 
 #include <stdlib.h>
-#include <stdarg.h>
-#include <stdexcept>
-#include "sm-util.hpp"
-
-std::string upper(const std::string& s)
-{
-  std::string r;
-
-  for ( const char* p = s.c_str(); *p; ++p )
-    r += toupper(*p);
-
-  return r;
-}
+#include <stdio.h>
+#include "error.hpp"
 
 void error(const char* s)
 {

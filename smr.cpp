@@ -15,7 +15,6 @@
 #include <stdarg.h>
 #include <vector>
 #include "instructions.hpp"
-#include "sm-util.hpp"
 #include "machine.hpp"
 #include "fileptr.hpp"
 

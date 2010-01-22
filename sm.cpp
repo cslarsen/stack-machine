@@ -10,9 +10,10 @@
 
 #include <stdio.h>
 #include "instructions.hpp"
-#include "sm-util.hpp"
 #include "fileptr.hpp"
 #include "compiler.hpp"
+#include "error.hpp"
+#include "upper.hpp"
 
 void compile_and_run(FILE* f)
 {

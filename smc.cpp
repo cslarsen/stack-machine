@@ -10,9 +10,9 @@
 
 #include <stdexcept>
 #include "instructions.hpp"
-#include "sm-util.hpp"
 #include "fileptr.hpp"
 #include "compiler.hpp"
+#include "error.hpp"
 
 const char* file = "";
 parser *p = NULL;
