@@ -1,4 +1,4 @@
-This project contains:
+This toy project contains:
 
 - A simple, stack-based virtual machine for executing low-level instructions
 - An assembler, supporting a Forth/PostScript-like language
