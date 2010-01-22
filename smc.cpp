@@ -21,7 +21,7 @@ parser *p = NULL;
 std::string basename(const std::string& s)
 {
   std::string::size_type p = s.rfind('.');
-  return p == std::string::npos ? s : s.substr(0, p);
+  return p <= 0 ? s : s.substr(0, p);
 }
 
 static void compile_error(const char* msg)
