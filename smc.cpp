@@ -17,6 +17,12 @@
 const char* file = "";
 parser *p = NULL;
 
+std::string basename(const std::string& s)
+{
+  std::string::size_type p = s.rfind('.');
+  return p == std::string::npos ? s : s.substr(0, p);
+}
+
 static void compile_error(const char* msg)
 {
   fprintf(stderr, "%s:%d:%s\n", file, p->get_lineno(), msg);
