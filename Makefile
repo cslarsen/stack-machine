@@ -7,13 +7,13 @@ all: $(TARGETS)
 %.sm: tests/%.src
 	./smc $<
 
-sm: sm-core.o machine.o sm-util.o fileptr.o sm.cpp
+smr: sm-core.o machine.o sm-util.o fileptr.o smr.cpp
 
 smc: sm-core.o machine.o sm-util.o fileptr.o parser.o compiler.o smc.cpp
 
 smd: sm-core.o machine.o sm-util.o fileptr.o smd.cpp
 
-smr: sm-core.o machine.o sm-util.o fileptr.o parser.o compiler.o smr.cpp
+sm: sm-core.o machine.o sm-util.o fileptr.o parser.o compiler.o sm.cpp
 
 check: all
 	./smc tests/hello-world.txt
