@@ -1,12 +1,15 @@
 ; Some helpful functions that can be implemented
 ; by primitives
 
-&main jmp
-
-no-op:  ; same as nop
-  0     ; push arbitrary value
-  drop  ; ... then pop ip
+_nop:  ; do nothing
   popip
+
+_jnz:
+  not jz
+  popip
+
+_jmp:
+  0 jz
 
 _swap:          ; ( a b -- b a)
   swap-a: nop   ; placeholder for a
@@ -15,6 +18,28 @@ _swap:          ; ( a b -- b a)
   load &swap-a  ; pop to a
   push &swap-a  ; push a
   push &swap-b  ; push b
+  popip
+
+_dup:           ; ( a -- a a )
+  nop           ; placeholder <- nop
+  &_dup stor ; placeholder <- a
+  &_dup load ; tos <- a
+  &_dup load ; tos <- a
+  popip
+
+_sub-two's-complementB: ; ( a b -- (b-a))
+  swap  ; b a
+  ;compl ; b ~a
+  1 add ; b (~a+1), or b -a
+  add   ; b-a
+  popip
+
+_rol3: ; ( a b c -- b c a )
+  rol3-var: nop  ; stack = a b c
+  &rol3-var stor ; stack = a b, var = c
+  swap           ; stack = b a, var = c
+  &rol3-var load ; stack = b a c
+  swap           ; stack = b c a
   popip
 
 +:              ; ( a b -- (a+b) )
@@ -65,7 +90,7 @@ mul:            ; ( a b -- (a*b) )
   &mul-res load
   popip
 
-_&:             ; ( a b -- (a AND b) )
+&:              ; ( a b -- (a AND b) )
   and           ; 32-bit bitwise AND operation
   popip
 
@@ -92,25 +117,3 @@ _&:             ; ( a b -- (a AND b) )
 @:              ; ( address -- value at address )
   load
   popip
-
-main:
-  1 outnum '+' out
-  2 outnum '+' out
-  3 outnum '+' out
-  4 outnum '+' out
-  5 outnum '=' out
-
-  1 2 3 4 5
-         +
-       +
-     +
-   +
-  outnum ; should be 15
-  '\n' out
-
-  6 outnum '*' out
-  7 outnum '=' out
-  6 7 * outnum ; should be 42
-  '\n' out
-
-  halt
