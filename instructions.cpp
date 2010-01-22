@@ -35,7 +35,7 @@ const char* OpStr[] = {
   "PUSHIP",
   "POPIP",
   "DROPIP",
-  "COPML",
+  "COMPL",
   "NOP_END"
 };
 
