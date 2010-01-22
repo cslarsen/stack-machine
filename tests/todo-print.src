@@ -1,0 +1,25 @@
+; This is a suggestion for a new "embed" keyword,
+; as well as support for parsing strings.
+
+&main jmp
+
+msg: embed "Hello, world!\n"
+num: embed 40
+
+printstr:         ; ( adr -- )
+  print-src: nop  ; placeholder
+  &print-src stor ; store src address to print-src
+
+  print-loop:
+    &print-src load        ; get ptr
+    dup +1 &print-src stor ; save ptr + 1
+    load                   ; get char
+    dup &print-exit jz     ; stop if '\0'
+    out                    ; print character
+    &print-loop jmp        ; loop
+
+  print-exit: popip
+
+main:
+  &msg printstr              ; print "Hello, world\n"
+  &num +1 +1 outnum '\n' out ; print "42"
