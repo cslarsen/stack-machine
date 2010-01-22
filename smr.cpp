@@ -9,17 +9,15 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <memory.h>
-#include <stdarg.h>
-#include <vector>
+#include "version.hpp"
 #include "instructions.hpp"
 #include "machine.hpp"
 #include "fileptr.hpp"
 
 static void help()
 {
+  printf("%s\n\n", VERSION);
+
   Op op=NOP; 
   do {
     printf("0x%x = %s\n", op, to_s(op));

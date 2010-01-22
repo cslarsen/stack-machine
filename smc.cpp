@@ -9,6 +9,7 @@
  */
 
 #include <stdexcept>
+#include "version.hpp"
 #include "instructions.hpp"
 #include "fileptr.hpp"
 #include "compiler.hpp"
@@ -40,14 +41,17 @@ int main(int argc, char** argv)
 {
   try {
     if ( argc < 2 )
-      error("Usage: sm-compile [ filename(s) ]");
+      error("Usage: smc [ filename(s) | - ]\n" VERSION);
 
     for ( int n=1; n<argc; ++n ) {
 
-      if ( !strcmp(argv[n], "-") )
+      if ( !strcmp(argv[n], "-") ) {
+        file = "<stdin>";
         compile(stdin, "out.sm");
-      else
+      } else {
+        file = argv[n];
         compile(fileptr(fopen(argv[n], "rt")), basename(argv[n]) + ".sm");
+      }
     }
 
     return 0;

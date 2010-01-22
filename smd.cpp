@@ -8,6 +8,7 @@
  *
  */
 
+#include <stdio.h>
 #include "instructions.hpp"
 #include "machine.hpp"
 #include "fileptr.hpp"
