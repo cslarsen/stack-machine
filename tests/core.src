@@ -29,7 +29,7 @@ _dup:           ; ( a -- a a )
 
 _sub-two's-complementB: ; ( a b -- (b-a))
   swap  ; b a
-  ;compl ; b ~a
+  compl ; b ~a
   1 add ; b (~a+1), or b -a
   add   ; b-a
   popip
