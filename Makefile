@@ -1,35 +1,35 @@
 CXXFLAGS = -g -Iinclude
-TARGETS = sm-core.o parser.o sm-util.o fileptr.o machine.o compiler.o sm-go sm-run sm-compile sm-dis
+TARGETS = sm-core.o parser.o sm-util.o fileptr.o machine.o compiler.o sm smr smc smd
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
 
 %.sm: tests/%.src
-	./sm-compile $<
+	./smc $<
 
-sm-run: sm-core.o machine.o sm-util.o fileptr.o sm-run.cpp
+sm: sm-core.o machine.o sm-util.o fileptr.o sm.cpp
 
-sm-compile: sm-core.o machine.o sm-util.o fileptr.o parser.o compiler.o sm-compile.cpp
+smc: sm-core.o machine.o sm-util.o fileptr.o parser.o compiler.o smc.cpp
 
-sm-dis: sm-core.o machine.o sm-util.o fileptr.o sm-dis.cpp
+smd: sm-core.o machine.o sm-util.o fileptr.o smd.cpp
 
-sm-go: sm-core.o machine.o sm-util.o fileptr.o parser.o compiler.o sm-go.cpp
+smr: sm-core.o machine.o sm-util.o fileptr.o parser.o compiler.o smr.cpp
 
 check: all
-	./sm-compile tests/hello-world.txt
-	./sm-dis tests/hello-world.sm
-	./sm-run tests/hello-world.sm
-	./sm-run tests/fib.sm | head -20
-	./sm-compile tests/hello.src
-	./sm-run tests/hello.sm
-	./sm-compile tests/hello-world.txt
-	./sm-run tests/hello-world.sm
-	./sm-compile tests/fib.src
-	./sm-run tests/fib.sm
-	./sm-compile tests/forward-goto.src
-	./sm-run tests/forward-goto.sm
-	./sm-go tests/yo.src
-	./sm-go tests/func.src
+	./smc tests/hello-world.txt
+	./smd tests/hello-world.sm
+	./sm tests/hello-world.sm
+	./sm tests/fib.sm | head -20
+	./smc tests/hello.src
+	./smr tests/hello.sm
+	./smc tests/hello-world.txt
+	./smr tests/hello-world.sm
+	./smc tests/fib.src
+	./smr tests/fib.sm
+	./smc tests/forward-goto.src
+	./smr tests/forward-goto.sm
+	./sm tests/yo.src
+	./sm tests/func.src
 
 clean:
 	rm -f $(TARGETS) *.stackdump tests/*.sm

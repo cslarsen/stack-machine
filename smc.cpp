@@ -4,6 +4,8 @@
  *
  * Placed in the public domain by the author.
  *
+ * Synopsis:  Compile source to bydecode.
+ *
  */
 
 #include <stdexcept>

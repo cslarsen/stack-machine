@@ -1,7 +1,7 @@
 This project contains:
 
 - A simple, stack-based virtual machine for executing low-level instructions
-- An assembler, supporting a Forth-like language
+- An assembler, supporting a Forth/PostScript-like language
 - An interpreter, able to run compiled programs
 
 To see an example of the assembly language, take a look at the Fibonacci
@@ -23,7 +23,15 @@ To compile and run the examples:
 
 To see the low-level machine instructions:
 
-  ./sm-run -h
+  ./smr -h
+
+To execute source code on-the-fly:
+
+  ./sm filename
+
+To compile source to bytecode:
+
+  ./smc filename
 
 The assembly language is not documented other than in code, because I'm
 actively playing with it.

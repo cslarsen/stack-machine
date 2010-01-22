@@ -4,6 +4,8 @@
  *
  * Placed in the public domain by the author.
  *
+ * Synopsis:  Run compiled bytecode.
+ *
  */
 
 #include <stdio.h>

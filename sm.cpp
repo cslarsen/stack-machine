@@ -4,6 +4,8 @@
  *
  * Placed in the public domain by the author.
  *
+ * Synopsis:  Compile and run code on-the-fly.
+ *
  */
 
 #include <stdio.h>

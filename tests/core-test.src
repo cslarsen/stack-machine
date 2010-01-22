@@ -1,6 +1,6 @@
 ; To run this example using the core.src library:
 ;
-;   cat tests/core-test.src tests/core.src > o.src && ./sm-go.exe o.src
+;   cat tests/core-test.src tests/core.src | ./sm
 ;
 
 1 outnum '+' out
