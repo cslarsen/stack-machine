@@ -6,7 +6,7 @@
  *
  */
 
-#include "sm-core.hpp"
+#include "instructions.hpp"
 #include "parser.hpp"
 #include "machine.hpp"
 

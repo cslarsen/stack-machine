@@ -9,7 +9,7 @@
  */
 
 #include <stdexcept>
-#include "sm-core.hpp"
+#include "instructions.hpp"
 #include "sm-util.hpp"
 #include "fileptr.hpp"
 #include "compiler.hpp"

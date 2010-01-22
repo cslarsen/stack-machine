@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
-#include "sm-core.hpp"
+#include "instructions.hpp"
 
 #ifndef INC_MACHINE_HPP
 #define INC_MACHINE_HPP

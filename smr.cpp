@@ -14,7 +14,7 @@
 #include <memory.h>
 #include <stdarg.h>
 #include <vector>
-#include "sm-core.hpp"
+#include "instructions.hpp"
 #include "sm-util.hpp"
 #include "machine.hpp"
 #include "fileptr.hpp"
