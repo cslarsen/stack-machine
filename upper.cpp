@@ -11,10 +11,10 @@
 
 std::string upper(const std::string& s)
 {
-  std::string r;
+  std::string r(s);
 
-  for ( const char* p = s.c_str(); *p; ++p )
-    r += toupper(*p);
+  for ( int n=0, l=s.length(); n<l; ++n )
+    r[n] = toupper(r[n]);
 
   return r;
 }
