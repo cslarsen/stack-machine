@@ -30,6 +30,7 @@ check: all
 	./smr tests/forward-goto.sm
 	./sm tests/yo.src
 	./sm tests/func.src
+	cat tests/core-test.src tests/core.src | ./sm -
 
 clean:
 	rm -f $(TARGETS) *.stackdump tests/*.sm
