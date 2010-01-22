@@ -1,5 +1,5 @@
 CXXFLAGS = -g -Iinclude
-TARGETS = sm-core.o parser.o sm-util.o fileptr.o machine.o compiler.o sm-go sm-run sm-compile sm-dis core.sm
+TARGETS = sm-core.o parser.o sm-util.o fileptr.o machine.o compiler.o sm-go sm-run sm-compile sm-dis
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
