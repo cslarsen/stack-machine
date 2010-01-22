@@ -30,7 +30,6 @@ check: all
 	./sm-run tests/forward-goto.sm
 	./sm-go tests/yo.src
 	./sm-go tests/func.src
-	./sm-run tests/core.sm
 
 clean:
 	rm -f $(TARGETS) *.stackdump tests/*.sm

@@ -34,6 +34,24 @@ machine_t::machine_t(const size_t memory_size,
   reset();
 }
 
+machine_t& machine_t::operator=(const machine_t& p)
+{
+  if ( &p == this )
+    return *this;
+
+  delete[](memory);
+
+  stack = p.stack;
+  labels = p.labels;
+  memsize = p.memsize;
+  memory = new int32_t[memsize];
+  memcpy(memory, p.memory, memsize*sizeof(int32_t));
+  ip = p.ip;
+  fin = p.fin;
+  fout = p.fout;
+  running = p.running;
+}
+
 void machine_t::reset()
 {
   memset(memory, NOP, memsize*sizeof(int32_t));
