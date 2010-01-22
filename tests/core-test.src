@@ -1,5 +1,7 @@
-; to compile:
-;   cat core.src core-test.src | ./sm-compile
+; To run this example using the core.src library:
+;
+;   cat tests/core-test.src tests/core.src > o.src && ./sm-go.exe o.src
+;
 
 1 outnum '+' out
 2 outnum '+' out
@@ -7,11 +9,11 @@
 4 outnum '+' out
 5 outnum '=' out
 
-1 2 3 4 5
+1 _dup +1 3 4 5
+             +
+           +
+         +
        +
-     +
-   +
- +
 outnum ; should be 15
 '\n' out
 
