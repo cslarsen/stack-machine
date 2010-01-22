@@ -27,6 +27,7 @@ class machine_t {
   void (*error_cb)(const char*);
 
 public:
+  machine_t(void (*error_callback)(const char* msg));
   machine_t(
     const size_t memory_size = 1024*1000/sizeof(int32_t),
     FILE* out = stdout,

@@ -110,7 +110,7 @@ void compiler::check_label_name(const std::string& label)
 }
 
 compiler::compiler(void (*cb)(const char*)) :
-  m(1024*1000/sizeof(int32_t), stdout, stdin, cb),
+  m(cb),
   callback(cb)
 {
 }
@@ -216,7 +216,7 @@ machine_t& compiler::get_program()
   return m;
 }
 
-compiler::compiler(parser& p, void (*fp)(const char*)) : callback(fp)
+compiler::compiler(parser& p, void (*fp)(const char*)) : m(fp), callback(fp)
 {
   // Perform complete compilation
   while ( compile_token(p.next_token(), p) )

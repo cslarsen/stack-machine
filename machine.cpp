@@ -41,6 +41,18 @@ machine_t::machine_t(const size_t memory_size,
   reset();
 }
 
+machine_t::machine_t(void (*error_callback)(const char*))
+:
+  memsize(1000*1024*sizeof(int32_t)),
+  memory(new int32_t[memsize]),
+  fout(stdout),
+  fin(stdin),
+  running(true),
+  error_cb(error_callback)
+{
+  reset();
+}
+
 machine_t& machine_t::operator=(const machine_t& p)
 {
   if ( &p == this )
@@ -556,8 +568,13 @@ int32_t machine_t::pos() const
 void machine_t::addlabel(const char* name, int32_t pos)
 {
   std::string n = upper(name);
-  n.erase(n.length()-1, 1); // remove ":"
-  labels.push_back(label_t(n.c_str(), pos));
+
+  if ( n.empty() )
+    error("Empty label");
+  else {
+    n.erase(n.length()-1, 1); // remove ":"
+    labels.push_back(label_t(n.c_str(), pos));
+  }
 }
 
 int32_t machine_t::get_label_address(const std::string& s) const

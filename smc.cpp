@@ -27,6 +27,7 @@ std::string basename(const std::string& s)
 static void compile_error(const char* msg)
 {
   fprintf(stderr, "%s:%d:%s\n", file, p->get_lineno(), msg);
+  exit(1);
 }
 
 void compile(FILE* f, const std::string& out)
