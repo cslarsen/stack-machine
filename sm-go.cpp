@@ -12,10 +12,8 @@
 #include "fileptr.hpp"
 #include "compiler.hpp"
 
-void compile_and_run(const char* filename)
+void compile_and_run(FILE* f)
 {
-  fprintf(stderr, "Running %s\n", filename);
-  fileptr f(fopen(filename, "rt"));
   parser p(f);
   compiler c(p, error);
   c.get_program().run();
@@ -24,8 +22,14 @@ void compile_and_run(const char* filename)
 int main(int argc, char** argv)
 {
   try {
+    if ( argc == 1 ) // by default, read standard input
+      compile_and_run(stdin);
+  
     for ( int n=1; n<argc; ++n )
-      compile_and_run(argv[n]);
+      if ( !strcmp(argv[n], "-") )
+        compile_and_run(stdin);
+      else
+        compile_and_run(fileptr(fopen(argv[n], "rt")));
 
     return 0;
   }
