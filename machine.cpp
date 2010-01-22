@@ -8,9 +8,11 @@
 
 #include "machine.hpp"
 #include "upper.hpp"
-#include "error.hpp"
 
-machine_t::machine_t(const machine_t& p) :
+machine_t::machine_t(
+  const machine_t& p,
+  void (*error_callback)(const char*))
+:
   stack(p.stack),
   labels(p.labels),
   memsize(p.memsize),
@@ -18,19 +20,23 @@ machine_t::machine_t(const machine_t& p) :
   ip(p.ip),
   fin(p.fin),
   fout(p.fout),
-  running(p.running)
+  running(p.running),
+  error_cb(error_callback)
 {
   memmove(memory, p.memory, memsize*sizeof(int32_t));
 }
 
 machine_t::machine_t(const size_t memory_size,
   FILE* out,
-  FILE* in) :
+  FILE* in,
+  void (*error_callback)(const char*))
+:
   memsize(memory_size),
   memory(new int32_t[memory_size]),
   fout(out),
   fin(in),
-  running(true)
+  running(true),
+  error_cb(error_callback)
 {
   reset();
 }
@@ -51,6 +57,7 @@ machine_t& machine_t::operator=(const machine_t& p)
   fin = p.fin;
   fout = p.fout;
   running = p.running;
+  error_cb = p.error_cb;
 }
 
 void machine_t::reset()
@@ -67,7 +74,8 @@ machine_t::~machine_t()
 
 void machine_t::error(const char* s) const
 {
-  ::error(s);
+  if ( error_cb )
+    error_cb(s);
 }
 
 void machine_t::push(const int32_t& n)

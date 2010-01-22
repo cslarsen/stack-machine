@@ -24,14 +24,15 @@ class machine_t {
   FILE* fin;
   FILE* fout;
   bool running;
+  void (*error_cb)(const char*);
 
 public:
   machine_t(
     const size_t memory_size = 1024*1000/sizeof(int32_t),
     FILE* out = stdout,
-    FILE* in  = stdin);
-
-  machine_t(const machine_t& p);
+    FILE* in  = stdin,
+    void (*error_callback)(const char* msg) = NULL);
+  machine_t(const machine_t& p, void (*error_callback)(const char* msg) = NULL);
   machine_t& operator=(const machine_t& p);
   ~machine_t();
   void reset();

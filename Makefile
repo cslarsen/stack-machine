@@ -7,7 +7,7 @@ all: $(TARGETS)
 %.sm: tests/%.src
 	./smc $<
 
-smr: instructions.o machine.o upper.o error.o fileptr.o smr.cpp
+smr: instructions.o machine.o upper.o fileptr.o smr.cpp
 
 smc: instructions.o machine.o upper.o error.o fileptr.o parser.o compiler.o smc.cpp
 

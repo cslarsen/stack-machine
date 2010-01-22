@@ -109,7 +109,9 @@ void compiler::check_label_name(const std::string& label)
     error("Label is reserved: HERE");
 }
 
-compiler::compiler(void (*cb)(const char*)) : callback(cb)
+compiler::compiler(void (*cb)(const char*)) :
+  m(1024*1000/sizeof(int32_t), stdout, stdin, cb),
+  callback(cb)
 {
 }
 
