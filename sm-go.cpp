@@ -14,7 +14,9 @@
 
 void compile_and_run(const char* filename)
 {
-  parser p(fileptr(fopen(filename, "rt")));
+  fprintf(stderr, "Running %s\n", filename);
+  fileptr f(fopen(filename, "rt"));
+  parser p(f);
   compiler c(p, error);
   c.get_program().run();
 }
