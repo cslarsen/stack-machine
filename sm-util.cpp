@@ -21,16 +21,6 @@ std::string upper(const std::string& s)
   return r;
 }
 
-std::string lower(const std::string& s)
-{
-  std::string r;
-
-  for ( const char* p = s.c_str(); *p; ++p )
-    r += tolower(*p);
-
-  return r;
-}
-
 void error(const char* s)
 {
   fprintf(stderr, "\n%s\n", s);

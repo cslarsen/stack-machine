@@ -9,6 +9,5 @@
 #include <string>
 
 std::string upper(const std::string& s);
-std::string lower(const std::string& s);
 std::string basename(const std::string& s);
 void error(const char* s);
