@@ -82,6 +82,7 @@ char compiler::to_ord(const std::string& s)
     }
 
   error("Unknown character literal: " + s);
+  return '\0';
 }
 
 bool compiler::islabel_ref(const std::string& s)
@@ -113,6 +114,7 @@ void compiler::check_label_name(const std::string& label)
 
 compiler::compiler(void (*cb)(const char*)) :
   m(cb),
+  forwards(),
   callback(cb)
 {
 }
@@ -175,9 +177,7 @@ void compiler::compile_literal(const std::string& token)
 
 void compiler::resolve_forwards()
 {
-  int32_t address;
-
-  for ( int n=0; n<forwards.size(); ++n ) {
+  for ( size_t n=0; n<forwards.size(); ++n ) {
     std::string label = forwards[n].name;
     int32_t address = m.get_label_address(label);
 
@@ -219,7 +219,7 @@ machine_t& compiler::get_program()
 }
 
 compiler::compiler(parser& p, void (*fp)(const char*)) :
-  m(fp), callback(fp)
+  m(fp), forwards(), callback(fp)
 {
   // Perform complete compilation
   while ( compile_token(p.next_token(), p) )
