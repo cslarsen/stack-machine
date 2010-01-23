@@ -17,6 +17,7 @@ machine_t::machine_t(
   void (*error_callback)(const char*))
 :
   stack(p.stack),
+  stackip(p.stackip),
   labels(p.labels),
   memsize(p.memsize),
   memory(new int32_t[p.memsize]),
@@ -34,10 +35,14 @@ machine_t::machine_t(const size_t memory_size,
   FILE* in,
   void (*error_callback)(const char*))
 :
+  stack(),
+  stackip(),
+  labels(),
   memsize(memory_size),
   memory(new int32_t[memory_size]),
-  fout(out),
+  ip(0),
   fin(in),
+  fout(out),
   running(true),
   error_cb(error_callback)
 {
@@ -46,10 +51,14 @@ machine_t::machine_t(const size_t memory_size,
 
 machine_t::machine_t(void (*error_callback)(const char*))
 :
+  stack(),
+  stackip(),
+  labels(),
   memsize(1000*1024*sizeof(int32_t)),
   memory(new int32_t[memsize]),
-  fout(stdout),
+  ip(0),
   fin(stdin),
+  fout(stdout),
   running(true),
   error_cb(error_callback)
 {
@@ -64,6 +73,7 @@ machine_t& machine_t::operator=(const machine_t& p)
   delete[](memory);
 
   stack = p.stack;
+  stackip = p.stackip;
   labels = p.labels;
   memsize = p.memsize;
   memory = new int32_t[memsize];
@@ -73,6 +83,8 @@ machine_t& machine_t::operator=(const machine_t& p)
   fout = p.fout;
   running = p.running;
   error_cb = p.error_cb;
+
+  return *this;
 }
 
 void machine_t::reset()
@@ -127,7 +139,7 @@ int32_t machine_t::pop()
 
 void machine_t::check_bounds(int32_t n, const char* msg) const
 {
-  if ( n<0 || n>=memsize )
+  if ( n < 0 || static_cast<size_t>(n) >= memsize )
     error(msg);
 }
 
@@ -135,7 +147,10 @@ void machine_t::next()
 {
   ip += sizeof(int32_t);
 
-  if ( ip >= memsize )
+  if ( ip < 0 )
+    error("IP < 0");
+
+  if ( static_cast<size_t>(ip) >= memsize )
     ip = 0; // TODO: Halt instead of wrap-around?
 }
 
@@ -165,6 +180,8 @@ int machine_t::run(int32_t start_address)
 
   while(running)
     exec(static_cast<Op>(memory[ip]));
+
+  return 0; // TODO: exit-code ?
 }
 
 void machine_t::instr_nop()
@@ -541,7 +558,7 @@ void machine_t::save_image(FILE* f) const
   int32_t *end = find_end() + sizeof(int32_t);
 
   while ( start != end ) {
-    int w = fwrite(start, sizeof(Op), 1, f);
+    fwrite(start, sizeof(Op), 1, f);
     start += sizeof(int32_t);
   }
 }
@@ -588,7 +605,7 @@ int32_t machine_t::get_label_address(const std::string& s) const
   if ( p == "HERE" )
     return ip;
 
-  for ( int n=0; n < labels.size(); ++n )
+  for ( size_t n=0; n < labels.size(); ++n )
     if ( upper(labels[n].name.c_str()) == p )
       return labels[n].pos;
   
