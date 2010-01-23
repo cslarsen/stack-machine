@@ -6,9 +6,11 @@
  *
  */
 
+#include <stdlib.h>
 #include "compiler.hpp"
 #include "parser.hpp"
 #include "machine.hpp"
+#include "label.hpp"
 #include "upper.hpp"
 
 void compiler::error(const std::string& s)
@@ -216,7 +218,8 @@ machine_t& compiler::get_program()
   return m;
 }
 
-compiler::compiler(parser& p, void (*fp)(const char*)) : m(fp), callback(fp)
+compiler::compiler(parser& p, void (*fp)(const char*)) :
+  m(fp), callback(fp)
 {
   // Perform complete compilation
   while ( compile_token(p.next_token(), p) )

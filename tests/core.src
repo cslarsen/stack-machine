@@ -1,6 +1,9 @@
 ; Some helpful functions that can be implemented
 ; by primitives
 
+; only parse this code, don't execute it
+&inc-core jmp
+
 _nop:  ; do nothing
   popip
 
@@ -117,3 +120,6 @@ mul:            ; ( a b -- (a*b) )
 @:              ; ( address -- value at address )
   load
   popip
+
+inc-core:
+  nop

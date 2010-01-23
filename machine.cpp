@@ -6,7 +6,10 @@
  *
  */
 
+#include <stdlib.h>
+#include <memory.h>
 #include "machine.hpp"
+#include "label.hpp"
 #include "upper.hpp"
 
 machine_t::machine_t(
@@ -565,7 +568,7 @@ int32_t machine_t::pos() const
   return ip;
 }
 
-void machine_t::addlabel(const char* name, int32_t pos)
+void machine_t::addlabel(const char* name, int32_t pos, int lineno)
 {
   std::string n = upper(name);
 

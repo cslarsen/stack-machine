@@ -6,14 +6,6 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <memory.h>
-#include <stdarg.h>
-#include <vector>
-#include <string>
-
 #ifndef INC_SMCORE_H
 #define INC_SMCORE_H
 
@@ -49,15 +41,5 @@ extern const char* OpStr[];
 
 const char* to_s(Op op);
 Op from_s(const char* s);
-
-struct label_t {
-  std::string name;
-  int32_t pos;
-
-  label_t(const std::string& name_, int32_t position)
-    : name(name_), pos(position)
-  {
-  }
-};
 
 #endif

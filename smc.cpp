@@ -8,6 +8,8 @@
  *
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include <stdexcept>
 #include "version.hpp"
 #include "instructions.hpp"

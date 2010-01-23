@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include "instructions.hpp"
+#include "label.hpp"
 
 #ifndef INC_MACHINE_HPP
 #define INC_MACHINE_HPP
@@ -60,7 +61,7 @@ public:
   int32_t pos() const;
 
   int32_t get_label_address(const std::string& label) const;
-  void addlabel(const char* name, int32_t pos);
+  void addlabel(const char* name, int32_t pos, int lineno = -1);
 
   bool isrunning() const;
   void set_fout(FILE*);
