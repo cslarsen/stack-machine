@@ -99,7 +99,7 @@ static void help()
   do {
     printf("0x%x = %s\n", op, to_s(op));
     op = static_cast<Op>(op+1);
-  } while ( op != JZ );
+  } while ( op != (1+JZ) );
 
   exit(0);
 }
