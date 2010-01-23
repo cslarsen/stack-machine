@@ -107,6 +107,8 @@ static void help()
 static void next()
 {
   ip += sizeof(int32_t);
+  if ( ip > sizeof(memory)/sizeof(int32_t) )
+    ip = 0;
 }
 
 static void reset()
