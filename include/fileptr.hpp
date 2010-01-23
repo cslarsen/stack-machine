@@ -13,6 +13,8 @@
 
 class fileptr {
   FILE* f;
+  fileptr(const fileptr&); // deny
+  fileptr& operator=(const fileptr&); // deny
 public:
   fileptr(FILE *file);
   ~fileptr();
