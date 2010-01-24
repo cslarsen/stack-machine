@@ -31,10 +31,11 @@ enum Op {
   IN,   // push one byte read from stream
   OUT,  // pop one byte and write to stream
   LOAD, // pop a, push byte read from address a
-  STORE,// pop a, pop b, write b to address a
+  STOR, // pop a, pop b, write b to address a
   JMP,  // pop a, goto a
   JZ,   // pop a, if a == 0 goto a
-  PUSH  // push next word
+  PUSH, // push next word
+  DUP   // duplicate word on stack
 };
 
 const char* to_s(Op op)
@@ -45,15 +46,15 @@ const char* to_s(Op op)
   case ADD: return "ADD"; break;
   case SUB: return "SUB"; break;
   case AND: return "AND"; break;
-  case OR: return "OR"; break;
+  case OR:  return "OR"; break;
   case XOR: return "XOR"; break;
   case NOT: return "NOT"; break;
-  case IN: return "IN"; break;
+  case IN:  return "IN"; break;
   case OUT: return "OUT"; break;
   case LOAD: return "LOAD"; break;
-  case STORE: return "STORE"; break;
+  case STOR: return "STOR"; break;
   case JMP: return "JMP"; break;
-  case JZ: return "JZ"; break;
+  case JZ:  return "JZ"; break;
   }
 }
 
@@ -64,15 +65,10 @@ int32_t ip = 0;
 FILE* fin = stdin;
 FILE* fout = stdout;
 
-static void error(const char* s, int code=1)
+static void stop(const char* s, int code=1)
 {
   fprintf(stderr, "%s\n", s);
   exit(code);
-}
-
-static void halt()
-{
-  error("HALT", 0);
 }
 
 static void push(const int32_t& n)
@@ -87,10 +83,13 @@ static int32_t pop()
   return n;
 }
 
-static bool inbounds(int32_t n)
+static void check_bounds(int32_t n, const char* msg)
 {
-  return n >= 0 &&
-    n <= sizeof(memory)/sizeof(int32_t);
+  if ( n>=0 && n<=sizeof(memory)/sizeof(int32_t) )
+    return;
+
+  fprintf(stderr, "%s out of bounds\n", msg);
+  exit(1);
 }
 
 static void help()
@@ -99,7 +98,12 @@ static void help()
   do {
     printf("0x%x = %s\n", op, to_s(op));
     op = static_cast<Op>(op+1);
-  } while ( op != (1+JZ) );
+  } while ( op != (1+DUP) );
+
+  printf("To halt program, jump to current position:\n\n");
+  printf("0x0 PUSH 0x%x\n", sizeof(int32_t));
+  printf("0x%x JMP\n\n", sizeof(int32_t));
+  printf("Word size is %d bytes\n", sizeof(int32_t));
 
   exit(0);
 }
@@ -146,8 +150,7 @@ int main(int argc, char** argv)
   // print message
   load(PUSH); load('H'); load(OUT);
   load(PUSH); load('e'); load(OUT);
-  load(PUSH); load('l'); load(OUT);
-  load(PUSH); load('l'); load(OUT);
+  load(PUSH); load('l'); load(DUP); load(OUT); load(OUT);
   load(PUSH); load('o'); load(OUT);
   load(PUSH); load(' '); load(OUT);
   load(PUSH); load('w'); load(OUT);
@@ -227,37 +230,27 @@ int main(int argc, char** argv)
 
     case LOAD:
       a = pop();
-
-      if ( inbounds(a) )
-        push(memory[a]);
-      else
-        error("LOAD out of bounds");
-
+      check_bounds(a, "LOAD");
+      push(memory[a]);
       next();
       break;
 
-    case STORE:
+    case STOR:
       a = pop();
       b = pop();
-
-      if ( inbounds(a) )
-        memory[a] = b;
-      else
-        error("STORE out of bounds");
-
+      check_bounds(a, "STOR");
+      memory[a] = b;
       next();
       break;
 
     case JMP:
       a = pop();
-
-      if ( !inbounds(a) )
-        error("JMP out of bounds");
+      check_bounds(a, "JMP");  
 
       // check if we are halting, i.e. jumping to current
       // address -- if so, quit
       if ( a == ip )
-        halt();
+        stop("HALT", 0);
 
       ip = a;
       break;
@@ -268,16 +261,21 @@ int main(int argc, char** argv)
       if ( a != 0 )
         next();
       else {
-        if ( !inbounds(a) )
-          error("JZ out of bounds");
-        else
-          ip = a;
+        check_bounds(a, "JZ");
+        ip = a; // jump
       }
       break;
 
     case PUSH:
       next();
       a = memory[ip];
+      push(a);
+      next();
+      break;
+
+    case DUP:
+      a = pop();
+      push(a);
       push(a);
       next();
       break;
