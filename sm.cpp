@@ -85,7 +85,7 @@ static int32_t pop()
 
 static void check_bounds(int32_t n, const char* msg)
 {
-  if ( n>=0 && n<=sizeof(memory)/sizeof(int32_t) )
+  if ( n>=0 && n<sizeof(memory)/sizeof(int32_t) )
     return;
 
   fprintf(stderr, "%s out of bounds\n", msg);
@@ -100,7 +100,7 @@ static void help()
     op = static_cast<Op>(op+1);
   } while ( op != (1+DUP) );
 
-  printf("To halt program, jump to current position:\n\n");
+  printf("\nTo halt program, jump to current position:\n\n");
   printf("0x0 PUSH 0x%x\n", sizeof(int32_t));
   printf("0x%x JMP\n\n", sizeof(int32_t));
   printf("Word size is %d bytes\n", sizeof(int32_t));
@@ -111,7 +111,7 @@ static void help()
 static void next()
 {
   ip += sizeof(int32_t);
-  if ( ip > sizeof(memory)/sizeof(int32_t) )
+  if ( ip >= sizeof(memory)/sizeof(int32_t) )
     ip = 0;
 }
 
