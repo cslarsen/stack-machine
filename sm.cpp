@@ -60,8 +60,9 @@ const char* to_s(Op op)
 
 // machine
 std::vector<int32_t> stack;
-int32_t memory[1024*1000];
-int32_t ip = 0;
+const size_t memsize = 1024*1000;
+int32_t memory[memsize];
+int32_t ip = 0; // instruction pointer
 FILE* fin = stdin;
 FILE* fout = stdout;
 
@@ -78,6 +79,9 @@ static void push(const int32_t& n)
 
 static int32_t pop()
 {
+  if ( stack.size() == 0 )
+    stop("POP empty stack", 1);
+
   int32_t n = stack.back();
   stack.pop_back();
   return n;
