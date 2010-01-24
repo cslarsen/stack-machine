@@ -65,6 +65,7 @@ int32_t memory[memsize];
 int32_t ip = 0; // instruction pointer
 FILE* fin = stdin;
 FILE* fout = stdout;
+const bool debug = true;
 
 static void stop(const char* s, int code=1)
 {
@@ -175,13 +176,15 @@ int main(int argc, char** argv)
 
     int32_t a=NOP, b=NOP;
 
-    if ( stack.size() > 1 )
-      a = stack[stack.size()-1];
-    if ( stack.size() > 2 )
-      b = stack[stack.size()-1];
+    if ( debug ) {
+      if ( stack.size() > 1 )
+        a = stack[stack.size()-1];
+      if ( stack.size() > 2 )
+        b = stack[stack.size()-1];
 
-    fprintf(stderr, "ip=%d op=%s stack(%d) = %d, %d\n",
-      ip, to_s(op), stack.size(), a, b);
+      fprintf(stderr, "ip=%d op=%s stack(%d) = %d, %d\n",
+        ip, to_s(op), stack.size(), a, b);
+    }
 
     a=b=NOP;
 
@@ -253,8 +256,10 @@ int main(int argc, char** argv)
 
       // check if we are halting, i.e. jumping to current
       // address -- if so, quit
-      if ( a == ip )
-        stop("HALT", 0);
+      if ( a == ip ) {
+        if ( debug ) stop("HALT", 0);
+        exit(0);
+      }
 
       ip = a;
       break;
