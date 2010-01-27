@@ -79,7 +79,7 @@ static int32_t pop()
 
 static void check_bounds(int32_t n, const char* msg)
 {
-  if ( n>=0 && n<sizeof(memory)/sizeof(int32_t) )
+  if ( n>=0 && n<memsize )
     return;
 
   fprintf(stderr, "%s out of bounds\n", msg);
@@ -105,7 +105,7 @@ static void help()
 static void next()
 {
   ip += sizeof(int32_t);
-  if ( ip >= sizeof(memory)/sizeof(int32_t) )
+  if ( ip >= memsize )
     ip = 0;
 }
 
@@ -128,8 +128,10 @@ static void load(int32_t n)
   next();
 }
 
-int start()
+int start(int32_t start_address = 0)
 {
+  ip = start_address;
+
   for (;;) {
     Op op = static_cast<Op>(memory[ip]);
 
