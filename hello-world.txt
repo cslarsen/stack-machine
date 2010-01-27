@@ -1,0 +1,16 @@
+// print message
+load(PUSH); load('H'); load(OUT);
+load(PUSH); load('e'); load(OUT);
+load(PUSH); load('l'); load(DUP); load(OUT); load(OUT);
+load(PUSH); load('o'); load(OUT);
+load(PUSH); load(' '); load(OUT);
+load(PUSH); load('w'); load(OUT);
+load(PUSH); load('o'); load(OUT);
+load(PUSH); load('r'); load(OUT);
+load(PUSH); load('l'); load(OUT);
+load(PUSH); load('d'); load(OUT);
+load(PUSH); load('!'); load(OUT);
+load(PUSH); load('\n'); load(OUT);
+
+// halt program
+load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
