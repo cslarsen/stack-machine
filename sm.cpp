@@ -127,33 +127,8 @@ static void init()
   ip = 0;
 }
 
-int main(int argc, char** argv)
+int start()
 {
-  for ( int n=1; n<argc; ++n )
-    if ( argv[n][0] == '-' )
-      help();
-
-  reset();
-
-  // print message
-  load(PUSH); load('H'); load(OUT);
-  load(PUSH); load('e'); load(OUT);
-  load(PUSH); load('l'); load(DUP); load(OUT); load(OUT);
-  load(PUSH); load('o'); load(OUT);
-  load(PUSH); load(' '); load(OUT);
-  load(PUSH); load('w'); load(OUT);
-  load(PUSH); load('o'); load(OUT);
-  load(PUSH); load('r'); load(OUT);
-  load(PUSH); load('l'); load(OUT);
-  load(PUSH); load('d'); load(OUT);
-  load(PUSH); load('!'); load(OUT);
-  load(PUSH); load('\n'); load(OUT);
-
-  // halt program
-  load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
-
-  init();
-
   for (;;) {
     Op op = static_cast<Op>(memory[ip]);
 
@@ -273,4 +248,34 @@ int main(int argc, char** argv)
       break;
     } 
   }
+}
+
+int main(int argc, char** argv)
+{
+  for ( int n=1; n<argc; ++n )
+    if ( argv[n][0] == '-' )
+      help();
+
+
+  reset();
+
+  // print message
+  load(PUSH); load('H'); load(OUT);
+  load(PUSH); load('e'); load(OUT);
+  load(PUSH); load('l'); load(DUP); load(OUT); load(OUT);
+  load(PUSH); load('o'); load(OUT);
+  load(PUSH); load(' '); load(OUT);
+  load(PUSH); load('w'); load(OUT);
+  load(PUSH); load('o'); load(OUT);
+  load(PUSH); load('r'); load(OUT);
+  load(PUSH); load('l'); load(OUT);
+  load(PUSH); load('d'); load(OUT);
+  load(PUSH); load('!'); load(OUT);
+  load(PUSH); load('\n'); load(OUT);
+
+  // halt program
+  load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
+
+  init();
+  return start();
 }
