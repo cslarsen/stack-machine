@@ -276,20 +276,6 @@ public:
   }
 };
 
-static void load_file(FILE* f)
-{
-  reset();
-
-  while ( !feof(f) ) {
-    Op op = NOP;
-    fread(&op, sizeof(op), 1, f);
-    load(op);
-  }
-
-  fprintf(stderr, "Read %u bytes\n", ip/sizeof(int32_t));
-  ip = 0;
-}
-
 static int32_t* find_end()
 {
   // find end of program by scanning
@@ -299,13 +285,29 @@ static int32_t* find_end()
   return p;
 }
 
+static void load_image(FILE* f)
+{
+  reset();
+
+  while ( !feof(f) ) {
+    Op op = NOP;
+    fread(&op, sizeof(Op), 1, f);
+    load(op);
+  }
+
+  fprintf(stderr, "Read %u bytes\n", ip/sizeof(int32_t));
+  ip = 0;
+}
+
 static void save_image(FILE* f)
 {
   int32_t *start = memory;
   int32_t *end = find_end() + sizeof(int32_t);
 
-  while ( start != end )
-    fputc(*start++, f);
+  while ( start != end ) {
+    int w = fwrite(start, sizeof(Op), 1, f);
+    start += sizeof(int32_t);
+  }
 }
 
 int main(int argc, char** argv)
@@ -320,13 +322,13 @@ int main(int argc, char** argv)
       found_file = true;
 
       reset();
-      load_file(fileptr(fopen(argv[n], "rb")));
+      load_image(fileptr(fopen(argv[n], "rb")));
       code |= start();
     }
 
   if ( !found_file ) {
     reset();
-    load_file(stdin);
+    load_image(stdin);
     return start();
   } else
     return code;
