@@ -12,6 +12,12 @@
  * Currently, the only program it accepts is hardcoded.
  * Program and memory size will be parameters later on.
  *
+ * To stop your programs, just loop forever, as in embedded systems;
+ * if you jump to the current line, this is understood as an
+ * infinite loop and main() will exit.  The code for that is:
+ *
+ * load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
+ *
  */
 
 #include <stdio.h>
@@ -106,8 +112,8 @@ static void next()
 static void reset()
 {
   memset(memory, NOP, sizeof(memory));
-  ip = 0;
   stack.clear();
+  ip = 0;
 }
 
 static void load(Op op)
@@ -120,11 +126,6 @@ static void load(int32_t n)
 {
   memory[ip] = n;
   next();
-}
-
-static void init()
-{
-  ip = 0;
 }
 
 int start()
@@ -256,7 +257,6 @@ int main(int argc, char** argv)
     if ( argv[n][0] == '-' )
       help();
 
-
   reset();
 
   // print message
@@ -276,6 +276,5 @@ int main(int argc, char** argv)
   // halt program
   load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
 
-  init();
   return start();
 }
