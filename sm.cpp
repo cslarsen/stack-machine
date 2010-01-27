@@ -30,7 +30,7 @@
 const char* to_s(Op op)
 {
   switch ( op ) {
-  default:
+  default:  return "<?>"; break;
   case NOP: return "NOP"; break;
   case ADD: return "ADD"; break;
   case SUB: return "SUB"; break;
@@ -44,6 +44,8 @@ const char* to_s(Op op)
   case STOR: return "STOR"; break;
   case JMP: return "JMP"; break;
   case JZ:  return "JZ"; break;
+  case PUSH:  return "PUSH"; break;
+  case DUP:  return "DUP"; break;
   }
 }
 
@@ -278,10 +280,13 @@ static void load_file(FILE* f)
 {
   reset();
 
-  while ( !feof(f) )
-    load(fgetc(f));
+  while ( !feof(f) ) {
+    Op op = NOP;
+    fread(&op, sizeof(op), 1, f);
+    load(op);
+  }
 
-  fprintf(stderr, "Read %u bytes\n", ip);
+  fprintf(stderr, "Read %u bytes\n", ip/sizeof(int32_t));
   ip = 0;
 }
 
@@ -297,9 +302,10 @@ static int32_t* find_end()
 static void save_image(FILE* f)
 {
   int32_t *start = memory;
-  int32_t *end = find_end();
-  size_t count = (1 + end - start) / sizeof(int32_t);
-  fwrite(memory, sizeof(int32_t), count, f);
+  int32_t *end = find_end() + sizeof(int32_t);
+
+  while ( start != end )
+    fputc(*start++, f);
 }
 
 int main(int argc, char** argv)
