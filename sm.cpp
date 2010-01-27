@@ -253,30 +253,61 @@ int start(int32_t start_address = 0)
   }
 }
 
+class fileptr {
+  FILE* f;
+public:
+  fileptr(const char* path) : f(fopen(path, "rb"))
+  {
+    if ( f == NULL ) {
+      fprintf(stderr, path? path : "<null path>");
+      exit(1);
+    }
+  }
+
+  ~fileptr()
+  {
+    fclose(f);
+  }
+
+  operator FILE*() const
+  {
+    return f;
+  }
+};
+
+static void load_file(FILE* f)
+{
+  reset();
+
+  while ( !feof(f) )
+    load(fgetc(f));
+
+  fprintf(stderr, "Read %u bytes", ip);
+  ip = 0;
+}
+
 int main(int argc, char** argv)
 {
+  bool found_file = false;
+  int code = 0;
+
   for ( int n=1; n<argc; ++n )
     if ( argv[n][0] == '-' )
       help();
+    else {
+      found_file = true;
 
-  reset();
+      reset();
+      load_file(fileptr(argv[n]));
+      code |= start();
+    }
 
-  // print message
-  load(PUSH); load('H'); load(OUT);
-  load(PUSH); load('e'); load(OUT);
-  load(PUSH); load('l'); load(DUP); load(OUT); load(OUT);
-  load(PUSH); load('o'); load(OUT);
-  load(PUSH); load(' '); load(OUT);
-  load(PUSH); load('w'); load(OUT);
-  load(PUSH); load('o'); load(OUT);
-  load(PUSH); load('r'); load(OUT);
-  load(PUSH); load('l'); load(OUT);
-  load(PUSH); load('d'); load(OUT);
-  load(PUSH); load('!'); load(OUT);
-  load(PUSH); load('\n'); load(OUT);
-
-  // halt program
-  load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
+  if ( !found_file ) {
+    reset();
+    load_file(stdin);
+    return start();
+  } else
+    return code;
 
   return start();
 }

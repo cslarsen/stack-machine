@@ -27,5 +27,3 @@ enum Op {
 };
 
 const char* to_s(Op op);
-
-
