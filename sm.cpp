@@ -49,7 +49,7 @@ const char* to_s(Op op)
 
 // machine
 std::vector<int32_t> stack;
-const size_t memsize = 1024*1000;
+const size_t memsize = (1024*1000)/sizeof(int32_t);
 int32_t memory[memsize];
 int32_t ip = 0; // instruction pointer
 FILE* fin = stdin;
@@ -256,11 +256,10 @@ int start(int32_t start_address = 0)
 class fileptr {
   FILE* f;
 public:
-  fileptr(const char* path) : f(fopen(path, "rb"))
+  fileptr(FILE *file) : f(file)
   {
     if ( f == NULL ) {
-      fprintf(stderr, path? path : "<null path>");
-      exit(1);
+      stop("fileptr null", 1);
     }
   }
 
@@ -282,8 +281,25 @@ static void load_file(FILE* f)
   while ( !feof(f) )
     load(fgetc(f));
 
-  fprintf(stderr, "Read %u bytes", ip);
+  fprintf(stderr, "Read %u bytes\n", ip);
   ip = 0;
+}
+
+static int32_t* find_end()
+{
+  // find end of program by scanning
+  // backwards until non-NOP is found
+  int32_t *p = &memory[memsize-1];
+  while ( *p == NOP ) --p;
+  return p;
+}
+
+static void save_image(FILE* f)
+{
+  int32_t *start = memory;
+  int32_t *end = find_end();
+  size_t count = (1 + end - start) / sizeof(int32_t);
+  fwrite(memory, sizeof(int32_t), count, f);
 }
 
 int main(int argc, char** argv)
@@ -298,7 +314,7 @@ int main(int argc, char** argv)
       found_file = true;
 
       reset();
-      load_file(fileptr(argv[n]));
+      load_file(fileptr(fopen(argv[n], "rb")));
       code |= start();
     }
 
