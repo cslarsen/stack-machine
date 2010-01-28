@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <memory.h>
+#include <stdarg.h>
 #include <vector>
 #include "sm.hpp"
 
@@ -56,12 +57,15 @@ int32_t memory[memsize];
 int32_t ip = 0; // instruction pointer
 FILE* fin = stdin;
 FILE* fout = stdout;
-const bool debug = true;
+const bool debug = false;
 
-static void stop(const char* s, int code=1)
+static void flog(FILE* f, const char* fmt, ...)
 {
-  fprintf(stderr, "%s\n", s);
-  exit(code);
+  if ( !debug ) return;
+  va_list v;
+  va_start(v, fmt);
+  vfprintf(f, fmt, v);
+  va_end(v);
 }
 
 static void push(const int32_t& n)
@@ -71,8 +75,10 @@ static void push(const int32_t& n)
 
 static int32_t pop()
 {
-  if ( stack.size() == 0 )
-    stop("POP empty stack", 1);
+  if ( stack.size() == 0 ) {
+    flog(stderr, "POP empty stack");
+    exit(1);
+  }
 
   int32_t n = stack.back();
   stack.pop_back();
@@ -84,7 +90,7 @@ static void check_bounds(int32_t n, const char* msg)
   if ( n>=0 && n<memsize )
     return;
 
-  fprintf(stderr, "%s out of bounds\n", msg);
+  flog(stderr, "%s out of bounds\n", msg);
   exit(1);
 }
 
@@ -145,7 +151,7 @@ int start(int32_t start_address = 0)
       if ( stack.size() > 2 )
         b = stack[stack.size()-1];
 
-      fprintf(stderr, "ip=%d op=%s stack(%d) = %d, %d\n",
+      flog(stderr, "ip=%d op=%s stack(%d) = %d, %d\n",
         ip, to_s(op), stack.size(), a, b);
     }
 
@@ -220,7 +226,7 @@ int start(int32_t start_address = 0)
       // check if we are halting, i.e. jumping to current
       // address -- if so, quit
       if ( a == ip ) {
-        if ( debug ) stop("HALT", 0);
+        flog(stderr, "HALT at 0x%x", ip);
         exit(0);
       }
 
@@ -261,7 +267,8 @@ public:
   fileptr(FILE *file) : f(file)
   {
     if ( f == NULL ) {
-      stop("fileptr null", 1);
+      fprintf(stderr, "Could not open file");
+      exit(1);
     }
   }
 
@@ -295,7 +302,7 @@ static void load_image(FILE* f)
     load(op);
   }
 
-  fprintf(stderr, "Read %u bytes\n", ip/sizeof(int32_t));
+  flog(stderr, "Read %u bytes\n", ip/sizeof(int32_t));
   ip = 0;
 }
 
