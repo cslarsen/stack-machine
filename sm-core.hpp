@@ -78,4 +78,5 @@ struct machine_t {
   void load_halt();
   void showstack();
   size_t size() const;
+  int32_t cur() const;
 };

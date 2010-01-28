@@ -336,3 +336,8 @@ size_t machine_t::size() const
 {
   return find_end() - &memory[0];
 }
+
+int32_t machine_t::cur() const
+{
+  return memory[ip];
+}

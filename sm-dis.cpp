@@ -22,25 +22,24 @@ static const char* printable(char c)
   }
 }
 
-static void disassemble(const machine_t &m)
+static void disassemble(machine_t &m)
 {
-  int32_t *p = &m.memory[0];
-  int32_t *end = m.find_end();
+  int32_t end = m.find_end() - &m.memory[0];
 
-  while ( p <= end ) {
-    Op op = static_cast<Op>(*p);
-    printf("0x%x %s", p - &m.memory[0], to_s(op));
+  while ( m.ip <= end ) {
+    Op op = static_cast<Op>(m.cur());
+    printf("0x%x %s", m.ip, to_s(op));
 
-    if ( op == PUSH && p <= end ) {
-        p += sizeof(int32_t);
-        printf(" 0x%x", *p);
+    if ( op==PUSH && m.ip<=end ) {
+        m.next();
+        printf(" 0x%x", m.cur());
 
-        if ( isprintable(*p) )
-          printf(" ('%s')", printable(*p));
+        if ( isprintable(m.cur()) )
+          printf(" ('%s')", printable(m.cur()));
     }
 
     printf("\n");
-    p += sizeof(int32_t);
+    m.next();
   }
 }
 
