@@ -47,6 +47,8 @@ const char* to_s(Op op)
   case JZ:  return "JZ"; break;
   case PUSH:  return "PUSH"; break;
   case DUP:  return "DUP"; break;
+  case SWAP: return "SWAP"; break;
+  case ROL3: return "ROL3"; break;
   }
 }
 
@@ -100,7 +102,7 @@ static void help()
   do {
     printf("0x%x = %s\n", op, to_s(op));
     op = static_cast<Op>(op+1);
-  } while ( op != (1+DUP) );
+  } while ( op != NOP_END );
 
   printf("\nTo halt program, jump to current position:\n\n");
   printf("0x0 PUSH 0x%x\n", sizeof(int32_t));
@@ -143,19 +145,18 @@ int start(int32_t start_address = 0)
   for (;;) {
     Op op = static_cast<Op>(memory[ip]);
 
-    int32_t a=NOP, b=NOP;
+    int32_t a=NOP, b=NOP, c=NOP;
 
     if ( debug ) {
-      if ( stack.size() > 1 )
-        a = stack[stack.size()-1];
-      if ( stack.size() > 2 )
-        b = stack[stack.size()-1];
+      if ( stack.size() > 1 ) a = stack[stack.size()-1];
+      if ( stack.size() > 2 ) b = stack[stack.size()-2];
+      if ( stack.size() > 3 ) c = stack[stack.size()-3];
 
-      flog(stderr, "ip=%d op=%s stack(%d) = %d, %d\n",
-        ip, to_s(op), stack.size(), a, b);
+      flog(stderr, "ip=%d op=%s stack(%d)=%d,%d,%d\n",
+        ip, to_s(op), stack.size(), a, b, c);
     }
 
-    a=b=NOP;
+    a = b = c = NOP;
 
     switch(op) {
     case NOP:
@@ -257,7 +258,25 @@ int start(int32_t start_address = 0)
       push(a);
       next();
       break;
-    } 
+
+    case SWAP: // a, b -- b, a
+      b = pop();
+      a = pop();
+      push(b);
+      push(a);
+      next();
+      break;
+
+    case ROL3: // abc -> bca
+      c = pop();
+      b = pop();
+      a = pop();
+      push(b);
+      push(c);
+      push(a);
+      next();
+      break;
+    }
   }
 }
 

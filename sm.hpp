@@ -23,7 +23,10 @@ enum Op {
   JMP,  // pop a, goto a
   JZ,   // pop a, if a == 0 goto a
   PUSH, // push next word
-  DUP   // duplicate word on stack
+  DUP,  // duplicate word on stack
+  SWAP, // swap top two words on stack
+  ROL3, // rotate top three words on stack once left, (a b c) -> (b c a)
+  NOP_END // placeholder for end of enum
 };
 
 const char* to_s(Op op);
