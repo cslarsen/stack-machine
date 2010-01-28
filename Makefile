@@ -9,6 +9,7 @@ sm-compile: sm-core.o sm-compile.cpp
 sm-dis: sm-core.o sm-dis.cpp
 
 check:
+	./sm-dis hello-world.sm
 	./sm-run hello-world.sm
 
 clean:
