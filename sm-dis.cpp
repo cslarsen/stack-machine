@@ -22,30 +22,21 @@ static const char* printable(char c)
   }
 }
 
-static void disassemble(FILE* f)
+static void disassemble(const machine_t &m)
 {
-  machine_t m;
-  m.load_image(f);
-
   int32_t *p = &m.memory[0];
   int32_t *end = m.find_end();
-
-  printf("--- %u bytes\n", end - p);
 
   while ( p <= end ) {
     Op op = static_cast<Op>(*p);
     printf("0x%x %s", p - &m.memory[0], to_s(op));
 
-    switch(op) {
-    default: break;
-    case PUSH:
-      if ( p <= end ) {
+    if ( op == PUSH && p <= end ) {
         p += sizeof(int32_t);
         printf(" 0x%x", *p);
+
         if ( isprintable(*p) )
           printf(" ('%s')", printable(*p));
-      }
-      break;
     }
 
     printf("\n");
@@ -57,8 +48,11 @@ int main(int argc, char** argv)
 {
   for ( int n=1; n<argc; ++n ) {
     if ( argv[n][0] != '-' ) {
-      printf("; File %s ", argv[n]);
-      disassemble(fileptr(fopen(argv[n], "rb")));
+      machine_t m;
+      m.load_image(fileptr(fopen(argv[n], "rb")));
+      printf("; File %s --- %u bytes\n", argv[n], m.size());
+
+      disassemble(m);
     }
   }
 

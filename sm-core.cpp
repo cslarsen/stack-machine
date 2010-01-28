@@ -331,3 +331,8 @@ void machine_t::load_halt()
   load(ip + sizeof(int32_t));
   load(JMP);
 }
+
+size_t machine_t::size() const
+{
+  return find_end() - &memory[0];
+}

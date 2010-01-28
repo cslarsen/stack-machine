@@ -77,4 +77,5 @@ struct machine_t {
   void save_image(FILE* f) const;
   void load_halt();
   void showstack();
+  size_t size() const;
 };
