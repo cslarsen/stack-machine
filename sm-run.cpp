@@ -26,7 +26,7 @@
 #include <memory.h>
 #include <stdarg.h>
 #include <vector>
-#include "sm.hpp"
+#include "sm-core.hpp"
 
 static void help()
 {

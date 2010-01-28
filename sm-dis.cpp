@@ -1,4 +1,4 @@
-#include "sm.hpp"
+#include "sm-core.hpp"
 
 int main(int argc, char** argv)
 {
