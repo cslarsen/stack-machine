@@ -33,6 +33,7 @@ enum Op {
   DUP,  // duplicate word on stack
   SWAP, // swap top two words on stack
   ROL3, // rotate top three words on stack once left, (a b c) -> (b c a)
+  OUTNUM, // pop one byte and write to stream as number
   NOP_END // placeholder for end of enum
 };
 
@@ -74,4 +75,6 @@ struct machine_t {
   int32_t* find_end() const;
   void load_image(FILE* f);
   void save_image(FILE* f) const;
+  void load_halt();
+  void showstack();
 };

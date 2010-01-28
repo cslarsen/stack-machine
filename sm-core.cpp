@@ -49,6 +49,7 @@ const char* to_s(Op op)
   case DUP:  return "DUP"; break;
   case SWAP: return "SWAP"; break;
   case ROL3: return "ROL3"; break;
+  case OUTNUM: return "OUTNUM"; break;
   }
 }
 
@@ -155,6 +156,14 @@ int machine_t::run(int32_t start_address)
     eval(static_cast<Op>(memory[ip]));
 }
 
+void machine_t::showstack()
+{
+  printf("Stack: ");
+  for ( int n=0; n < stack.size(); ++n )
+    printf("%d ", stack[n]);
+  printf("\n");
+}
+
 void machine_t::eval(Op op)
 {
   int32_t a=NOP, b=NOP, c=NOP;
@@ -203,6 +212,11 @@ void machine_t::eval(Op op)
 
   case OUT:
     putc(pop(), fout);
+    next();
+    break;
+
+  case OUTNUM:
+    fprintf(fout, "%u", pop());
     next();
     break;
 
@@ -309,4 +323,11 @@ void machine_t::save_image(FILE* f) const
     int w = fwrite(start, sizeof(Op), 1, f);
     start += sizeof(int32_t);
   }
+}
+
+void machine_t::load_halt()
+{
+  load(PUSH);
+  load(ip + sizeof(int32_t));
+  load(JMP);
 }
