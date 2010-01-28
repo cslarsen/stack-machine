@@ -1,5 +1,27 @@
 #include "sm-core.hpp"
 
+static bool isprintable(char c)
+{
+  return (c>=32 && c<=127)
+    || c=='\n'
+    || c=='\r'
+    || c=='\t';
+}
+
+static const char* printable(char c)
+{
+  static char buf[2];
+  buf[0] = c;
+  buf[1] = '\0';
+
+  switch ( c ) {
+  default: return buf;
+  case '\t': return "\\t";
+  case '\n': return "\\n";
+  case '\r': return "\\r";
+  }
+}
+
 static void disassemble(FILE* f)
 {
   machine_t m;
@@ -20,8 +42,8 @@ static void disassemble(FILE* f)
       if ( p <= end ) {
         p += sizeof(int32_t);
         printf(" 0x%x", *p);
-        if ( *p>=32 && *p<=127 )
-          printf(" ('%c')", *p);
+        if ( isprintable(*p) )
+          printf(" ('%s')", printable(*p));
       }
       break;
     }
