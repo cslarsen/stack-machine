@@ -1,0 +1,27 @@
+main:
+  push 0                    ; first Fibonacci number
+  dup outnum push '\n' out  ; prints "0\n"
+
+  push 1                    ; second Fibonacci number
+
+label:
+  swap    ; stack: 1 0
+  dup     ; stack: 1 0 0
+  rol3    ; stack: 0 0 1
+  dup     ; stack: 0 0 1 1
+  rol3    ; stack: 0 1 1 0
+  swap    ; stack: 0 1 0 1
+
+  ; add top two numbers
+  add     ; stack: 0 1 2
+  dup     ; stack: 0 1 2 2
+
+  ; print result
+  outnum  ; 0 1 2
+  push '\n' out
+
+  ; goto label
+  push &label
+  jmp
+
+  halt

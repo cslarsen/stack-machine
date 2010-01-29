@@ -28,29 +28,53 @@
 #include <vector>
 #include "sm-core.hpp"
 
+const char* OpStr[] = {
+  "NOP",
+  "ADD",
+  "SUB",
+  "AND",
+  "OR",
+  "XOR",
+  "NOT",
+  "IN",
+  "OUT",
+  "LOAD",
+  "STOR",
+  "JMP",
+  "JZ",
+  "PUSH",
+  "DUP",
+  "SWAP",
+  "ROL3",
+  "OUTNUM",
+  "NOP_END"
+};
+
 const char* to_s(Op op)
 {
-  switch ( op ) {
-  default:  return "<?>"; break;
-  case NOP: return "NOP"; break;
-  case ADD: return "ADD"; break;
-  case SUB: return "SUB"; break;
-  case AND: return "AND"; break;
-  case OR:  return "OR"; break;
-  case XOR: return "XOR"; break;
-  case NOT: return "NOT"; break;
-  case IN:  return "IN"; break;
-  case OUT: return "OUT"; break;
-  case LOAD: return "LOAD"; break;
-  case STOR: return "STOR"; break;
-  case JMP: return "JMP"; break;
-  case JZ:  return "JZ"; break;
-  case PUSH:  return "PUSH"; break;
-  case DUP:  return "DUP"; break;
-  case SWAP: return "SWAP"; break;
-  case ROL3: return "ROL3"; break;
-  case OUTNUM: return "OUTNUM"; break;
-  }
+  if ( op >= NOP && op < NOP_END )
+    return OpStr[op];
+  return "<?>";
+}
+
+Op from_s(const char* s)
+{
+  int l = strlen(s);
+  char* p = static_cast<char*>(malloc(l+1));
+  strcpy(p, s);
+  for ( char* d=p; *d; ++d )
+    if ( *d>='a' && *d<='z' )
+      *d = *d - 'a' + 'A';
+
+  // p is now uppercase of s
+  for ( int n=0; n<NOP_END; ++n )
+    if ( !strcmp(p, OpStr[n]) ) {
+      free(p);
+      return static_cast<Op>(n);
+    }
+
+  free(p);
+  return NOP_END;
 }
 
 fileptr::fileptr(FILE *file) : f(file)

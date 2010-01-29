@@ -14,6 +14,7 @@
 #include <memory.h>
 #include <stdarg.h>
 #include <vector>
+#include <string>
 
 enum Op {
   NOP,  // do nothing
@@ -37,7 +38,10 @@ enum Op {
   NOP_END // placeholder for end of enum
 };
 
+extern const char* OpStr[];
+
 const char* to_s(Op op);
+Op from_s(const char* s);
 
 class fileptr {
   FILE* f;
@@ -47,8 +51,19 @@ public:
   operator FILE*() const;
 };
 
+struct label_t {
+  std::string name;
+  int32_t pos;
+
+  label_t(const char* name_, int32_t position)
+    : name(name_), pos(position)
+  {
+  }
+};
+
 struct machine_t {
   std::vector<int32_t> stack;
+  std::vector<label_t> labels;
   const size_t memsize;
   int32_t *memory;
   int32_t ip; // instruction pointer
