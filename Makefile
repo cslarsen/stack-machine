@@ -14,6 +14,8 @@ check:
 	./sm-run fib.sm | head -20
 	./sm-compile hello.src
 	./sm-run hello.src.sm
+	./sm-compile hello-world.txt
+	./sm-run hello-world.txt.sm
 
 clean:
 	rm -f $(TARGETS)

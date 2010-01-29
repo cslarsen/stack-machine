@@ -1,16 +1,25 @@
-// print message
-load(PUSH); load('H'); load(OUT);
-load(PUSH); load('e'); load(OUT);
-load(PUSH); load('l'); load(DUP); load(OUT); load(OUT);
-load(PUSH); load('o'); load(OUT);
-load(PUSH); load(' '); load(OUT);
-load(PUSH); load('w'); load(OUT);
-load(PUSH); load('o'); load(OUT);
-load(PUSH); load('r'); load(OUT);
-load(PUSH); load('l'); load(OUT);
-load(PUSH); load('d'); load(OUT);
-load(PUSH); load('!'); load(OUT);
-load(PUSH); load('\n'); load(OUT);
+; Hello world program
 
-// halt program
-load(PUSH); load(ip+sizeof(int32_t)); load(JMP);
+push 10   ; \n
+push 33   ; !
+push 100  ; d
+push 108  ; l
+push 114  ; r
+push 111  ; o
+push 119  ; w
+push 32   ;  
+push 44   ; ,
+push 111  ; o
+push 108  ; l
+dup       ; l
+push 101  ; e
+push 72   ; H
+
+; print 14 characters
+out out out out
+out out out out
+out out out out
+out out
+
+; halt program
+halt
