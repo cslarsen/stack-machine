@@ -1,13 +1,15 @@
 This is a very simple stack-based virtual machine, written in C++.
 
 The word length is currently 32-bit, you have 1 Mb at your disposal
-for text + memory, and the opcodes can be found by compiling and
+for text and memory.  The opcodes can be found by compiling and
 running:
 
-g++ sm.cpp -osm
-./sm -h
+make all
+./sm-run -h
 
-Currently, the only program it will run is hard coded.  It is, however,
-trivial to load it from standard input or similar.
+A working, but incomplete, assembler can be found in sm-compile.cpp.
+An example hello world program can be found in hello.src, with a
+Fibonacci number generator in compiled bytecode in fib.sm.
 
-Placed in the public domain by the author, Christian Stigen Larsen, 2010.
+Placed in the public domain in 2010 by the author, Christian Stigen Larsen
+http://csl.sublevel3.org
