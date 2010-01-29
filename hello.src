@@ -1,0 +1,23 @@
+; labels are written as a name without whitespace
+; and a colon at the end
+
+; jumping to labels is not yet supported by the
+; assembler
+
+main:
+  ; this is a comment
+
+  push 72 out           ; "H"
+  push 101 out          ; "e"
+  push 108 dup out out  ; "ll"
+  push 111 out          ; "o"
+  push 33 out           ; "!"
+
+  ; newline
+  push 10 push 13 out out
+
+  push 42 outnum          ; print number
+  push 10 push 13 out out ; ... and CRLF
+
+  ; stop program
+  halt
