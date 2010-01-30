@@ -4,8 +4,12 @@ The word length is currently 32-bit, you have 1 Mb at your disposal
 for text and memory.  The opcodes can be found by compiling and
 running:
 
-make all
-./sm-run -h
+  make all
+  ./sm-run -h
+
+To test out some programs:
+
+  make all check
 
 A working, but incomplete, assembler can be found in sm-compile.cpp.
 An example hello world program can be found in hello.src, with a
