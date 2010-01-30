@@ -14,6 +14,13 @@ static int fgetchar(FILE* f)
   return n;
 }
 
+std::string toupper(const char* s)
+{
+  std::string p;
+  while ( *s ) p += toupper(*s++);
+  return p;
+}
+
 static bool char_in(char ch, const char* in)
 {
   while ( *in )
@@ -104,13 +111,15 @@ bool ischar(const char* s)
   if ( l<3 || l>4) // not of format '?' or '\?'
     return false;
 
-  if ( !(s[0] == s[l-1] == '\'') )
+  if ( !(s[0] == '\'' && s[l-1] == '\'') )
     return false;
+
 
   if ( l == 4 ) { // '\n'
     if ( s[1] != '\\' )
       return false;
-    if ( !char_in(s[2], "trn0") ) // \t, \r, \n, \0, etc
+
+    if ( !char_in(s[2], "trn0") ) // \t, \r, \n, \0, etc 
       return false;
   }
 
@@ -134,9 +143,6 @@ char to_ord(const char* s)
 
   fprintf(stderr, "%s:%d:Unknown character literal %s\n", filename, lineno, s);
   exit(1);
-
-  // todo: raise error here
-  return '\0';
 }
 
 bool islabel_ref(const char* s)
@@ -152,7 +158,13 @@ int32_t to_literal(const char* s)
   if ( ischar(s) )
     return to_ord(s);
 
-  return atoi(s);
+  fprintf(stderr, "%s:%d:Unknown literal %s\n", filename, lineno, s);
+  exit(1);
+}
+
+bool ishalt(const char* s)
+{
+  return toupper(s) == "HALT";
 }
 
 int main(int argc, char** argv)
@@ -174,11 +186,18 @@ int main(int argc, char** argv)
     } else if ( iscomment(t) ) {
       // skip to end of line
       skipto(f, "\n");
+    } else if ( ishalt(t) ) {
+      // add halt function
+      m.load_halt();
     } else if ( isliteral(t) ) {
       // convert literal: 0x12 / '\n' / 0123 / 123 to number
-      int32_t literal = to_literal(t);
+      int32_t literal;
+
       if ( islabel_ref(t) )
         literal = m.get_label_address(t+1);
+      else
+        literal = to_literal(t);
+
       m.load(literal);
     } else if ( islabel(t) ) {
       m.addlabel(t, m.ip);
