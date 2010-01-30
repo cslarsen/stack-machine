@@ -29,12 +29,14 @@ enum Op {
   LOAD, // pop a, push byte read from address a
   STOR, // pop a, pop b, write b to address a
   JMP,  // pop a, goto a
-  JZ,   // pop a, if a == 0 goto a
+  JZ,   // pop a, pop b, if a == 0 goto b
   PUSH, // push next word
   DUP,  // duplicate word on stack
   SWAP, // swap top two words on stack
   ROL3, // rotate top three words on stack once left, (a b c) -> (b c a)
   OUTNUM, // pop one byte and write to stream as number
+  JNZ,  // pop a, pop b, if a != 0 goto b
+  DROP, // remove top of stack
   NOP_END // placeholder for end of enum
 };
 

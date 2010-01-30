@@ -47,6 +47,8 @@ const char* OpStr[] = {
   "SWAP",
   "ROL3",
   "OUTNUM",
+  "JNZ",
+  "DROP",
   "NOP_END"
 };
 
@@ -281,12 +283,30 @@ void machine_t::eval(Op op)
 
   case JZ:
     a = pop();
+    b = pop();
 
     if ( a != 0 )
       next();
     else {
-      check_bounds(a, "JZ");
-      ip = a; // jump
+      check_bounds(b, "JZ");
+      ip = b; // jump
+    }
+    break;
+
+  case DROP:
+    pop();
+    next();
+    break;
+
+  case JNZ:
+    a = pop();
+    b = pop();
+
+    if ( a == 0 )
+      next();
+    else {
+      check_bounds(b, "JNZ");
+      ip = b; // jump
     }
     break;
 
@@ -380,6 +400,11 @@ void machine_t::addlabel(const char* name, int32_t pos)
   labels.push_back(label_t(n.c_str(), pos));
 }
 
+/*
+ * TODO: Add support for forward labels!  (can be done by
+ *       scanning the file twice or similar.
+ *
+ */
 int32_t machine_t::get_label_address(const char* s) const
 {
   std::string p = toupper(s);

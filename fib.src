@@ -1,8 +1,16 @@
+  nop ; make room for counter
+
 main:
   push 0                    ; first Fibonacci number
   dup outnum push '\n' out  ; prints "0\n"
 
   push 1                    ; second Fibonacci number
+
+  ; initialiez counter
+
+  push 46 ; print only first 45 Fibonacci numbers
+  push 0  ; address to counter
+  stor    ; store number at address 0 (which we reserved)
 
 label:
   swap    ; stack: 1 0
@@ -20,8 +28,16 @@ label:
   outnum  ; 0 1 2
   push '\n' out
 
-  ; goto label
-  push &label
-  jmp
+  ; decrement counter
+  ; -----------------
+    
+  push 0 load       ; load number from address 0
 
+  push 1 swap sub   ; decrement by one
+  dup push 0 stor   ; store result to address 0
+
+  ; loop if not zero
+  push &label swap jnz
+
+  ; else, stop
   halt

@@ -2,7 +2,7 @@
 #include <vector>
 #include "sm-core.hpp"
 
-static size_t lineno = 1;
+static int lineno = 1;
 static const char* filename = "";
 
 static const char WHITESPACE[] = "\r\n\t ";
@@ -37,6 +37,7 @@ static void skip(FILE* f, const char* chars)
     && char_in(ch, chars) )
       ; // loop
 
+  if ( ch == '\n' ) --lineno;
   ungetc(ch, f);
 }
 
@@ -48,6 +49,7 @@ static void skipto(FILE* f, const char* chars)
     && !char_in(ch, chars) )
       ; // loop
 
+  if ( ch == '\n' ) --lineno;
   ungetc(ch, f);
 }
 
@@ -108,22 +110,14 @@ bool ischar(const char* s)
 {
   size_t l = strlen(s);
 
-  if ( l<3 || l>4) // not of format '?' or '\?'
-    return false;
+  if ( l==3 && s[0]=='\'' && s[2]=='\'' && s[1]!='\\' )
+    return true;
 
-  if ( !(s[0] == '\'' && s[l-1] == '\'') )
-    return false;
+  if ( l==4 && s[0]=='\'' && s[3]=='\'' && s[1]=='\\' 
+            && char_in(s[2], "trn0") )
+    return true;
 
-
-  if ( l == 4 ) { // '\n'
-    if ( s[1] != '\\' )
-      return false;
-
-    if ( !char_in(s[2], "trn0") ) // \t, \r, \n, \0, etc 
-      return false;
-  }
-
-  return true;
+  return false;
 }
 
 char to_ord(const char* s)
@@ -177,6 +171,11 @@ int main(int argc, char** argv)
   filename = argv[1];
   machine_t m;
   FILE *f = fopen(filename, "rt");
+
+  if ( f == NULL ) {
+    fprintf(stderr, "Could not open %s\n", filename);
+    exit(1);
+  }
 
   while ( !feof(f) ) {
     skipws(f);
