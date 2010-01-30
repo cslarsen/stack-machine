@@ -57,6 +57,13 @@ const char* to_s(Op op)
   return "<?>";
 }
 
+static std::string toupper(const char* s)
+{
+  std::string p;
+  while ( *s ) p += toupper(*s++);
+  return p;
+}
+
 Op from_s(const char* s)
 {
   int l = strlen(s);
@@ -365,3 +372,22 @@ int32_t machine_t::cur() const
 {
   return memory[ip];
 }
+
+void machine_t::addlabel(const char* name, int32_t pos)
+{
+  std::string n = toupper(name);
+  n.erase(n.length()-1, 1); // remove ":"
+  labels.push_back(label_t(n.c_str(), pos));
+}
+
+int32_t machine_t::get_label_address(const char* s) const
+{
+  std::string p = toupper(s);
+
+  for ( int n=0; n < labels.size(); ++n )
+    if ( toupper(labels[n].name.c_str()) == p )
+      return labels[n].pos;
+  
+  return -1; // not found
+}
+

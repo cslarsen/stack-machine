@@ -94,4 +94,6 @@ struct machine_t {
   void showstack();
   size_t size() const;
   int32_t cur() const;
+  int32_t get_label_address(const char* label) const;
+  void addlabel(const char* name, int32_t pos);
 };
