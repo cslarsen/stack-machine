@@ -400,14 +400,12 @@ void machine_t::addlabel(const char* name, int32_t pos)
   labels.push_back(label_t(n.c_str(), pos));
 }
 
-/*
- * TODO: Add support for forward labels!  (can be done by
- *       scanning the file twice or similar.
- *
- */
 int32_t machine_t::get_label_address(const char* s) const
 {
   std::string p = toupper(s);
+
+  // special label address "here" returns current position
+  if ( p == "HERE" ) return ip;
 
   for ( int n=0; n < labels.size(); ++n )
     if ( toupper(labels[n].name.c_str()) == p )

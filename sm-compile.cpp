@@ -177,6 +177,10 @@ int main(int argc, char** argv)
     exit(1);
   }
 
+  // store CODE POINTS that will later
+  // be filled with LABEL ADDRESSES
+  std::vector<label_t> forwards;
+
   while ( !feof(f) ) {
     skipws(f);
     const char* t = token(f);
@@ -192,8 +196,20 @@ int main(int argc, char** argv)
       // convert literal: 0x12 / '\n' / 0123 / 123 to number
       int32_t literal;
 
-      if ( islabel_ref(t) )
+      if ( islabel_ref(t) ) {
         literal = m.get_label_address(t+1);
+        if ( literal == -1 ) {
+          // label was not found,
+          // store current address and update it later on
+
+          if ( toupper(t+1) == "HERE" ) {
+            fprintf(stderr, "%s:%d:Special label HERE is reserved\n", filename, lineno);
+            exit(1);
+          }
+
+          forwards.push_back(label_t(t+1, m.ip));
+        }
+      }
       else
         literal = to_literal(t);
 
@@ -212,12 +228,29 @@ int main(int argc, char** argv)
 
       m.load(op);
     }
+
   }
 
   // just in case, add a halt instruction
   m.load_halt();
   fclose(f);
 
+  // now update all forward jumps, since
+  // we now know all code labels.
+  // If a label is not found this time,
+  // we should raise an error
+  for ( int n=0; n<forwards.size(); ++n ) {
+    int32_t adr = m.get_label_address(forwards[n].name.c_str());
+
+    if ( adr == -1 ) {
+      fprintf(stderr, "%s:Code label '%s' not found\n", filename, forwards[n].name.c_str());
+      exit(1);
+    }
+
+    // update label jump to address
+    m.memory[forwards[n].pos] = adr;
+  }
+  
   // now save to same name with .sm suffix
   std::string str = filename;
   str += ".sm";

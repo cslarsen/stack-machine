@@ -1,0 +1,27 @@
+; simple test of forward labels
+
+start:
+  push &cause jmp
+
+effect:
+  push 'e' out
+  push 'f' out
+  push 'f' out
+  push 'e' out
+  push 'c' out
+  push 't' out
+  push '\n' out
+  halt
+
+cause:
+  push 'c' out
+  push 'a' out
+  push 'u' out
+  push 's' out
+  push 'e' out
+  push 32 out
+  push '-' out
+  push '>' out
+  push 32 out
+  push &effect
+  jmp
