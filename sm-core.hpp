@@ -63,7 +63,7 @@ struct label_t {
   }
 };
 
-struct machine_t {
+class machine_t {
   std::vector<int32_t> stack;
   std::vector<label_t> labels;
   const size_t memsize;
@@ -73,6 +73,7 @@ struct machine_t {
   FILE* fout;
   bool running;
 
+public:
   machine_t(
     const size_t memory_size = 1024*1000/sizeof(int32_t),
     FILE* out = stdout,
@@ -83,7 +84,7 @@ struct machine_t {
   void error(const char* s) const;
   void push(const int32_t& n);
   int32_t pop();
-  void check_bounds(int32_t n, const char* msg);
+  void check_bounds(int32_t n, const char* msg) const; 
   void next();
   void load(Op op);
   void load(int32_t n);
@@ -93,9 +94,19 @@ struct machine_t {
   void load_image(FILE* f);
   void save_image(FILE* f) const;
   void load_halt();
-  void showstack();
+  void showstack() const;
+
   size_t size() const;
   int32_t cur() const;
+  int32_t pos() const;
+
   int32_t get_label_address(const char* label) const;
   void addlabel(const char* name, int32_t pos);
+
+  bool isrunning() const;
+  void set_fout(FILE*);
+  void set_fin(FILE*);
+
+  void set_mem(int32_t adr, int32_t val);
+  int32_t get_mem(int32_t adr) const;
 };

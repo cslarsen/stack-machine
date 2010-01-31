@@ -154,7 +154,7 @@ int32_t machine_t::pop()
   return n;
 }
 
-void machine_t::check_bounds(int32_t n, const char* msg)
+void machine_t::check_bounds(int32_t n, const char* msg) const
 {
   if ( n>=0 && n<memsize )
     return;
@@ -189,7 +189,7 @@ int machine_t::run(int32_t start_address)
     eval(static_cast<Op>(memory[ip]));
 }
 
-void machine_t::showstack()
+void machine_t::showstack() const
 {
   printf("Stack: ");
   for ( int n=0; n < stack.size(); ++n )
@@ -393,6 +393,11 @@ int32_t machine_t::cur() const
   return memory[ip];
 }
 
+int32_t machine_t::pos() const
+{
+  return ip;
+}
+
 void machine_t::addlabel(const char* name, int32_t pos)
 {
   std::string n = toupper(name);
@@ -414,3 +419,29 @@ int32_t machine_t::get_label_address(const char* s) const
   return -1; // not found
 }
 
+bool machine_t::isrunning() const
+{
+  return running;
+}
+
+void machine_t::set_fout(FILE* f)
+{
+  fout = f;
+}
+
+void machine_t::set_fin(FILE* f)
+{
+  fin = f;
+}
+
+void machine_t::set_mem(int32_t adr, int32_t val)
+{
+  check_bounds(adr, "set_mem out of bounds");
+  memory[adr] = val;
+}
+
+int32_t machine_t::get_mem(int32_t adr) const
+{
+  check_bounds(adr, "get_mem out of bounds");
+  return memory[adr];
+}

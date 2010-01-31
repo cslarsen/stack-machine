@@ -24,13 +24,13 @@ static const char* printable(char c)
 
 static void disassemble(machine_t &m)
 {
-  int32_t end = m.find_end() - &m.memory[0];
+  int32_t end = m.size();
 
-  while ( m.ip <= end ) {
+  while ( m.pos() <= end ) {
     Op op = static_cast<Op>(m.cur());
-    printf("0x%x %s", m.ip, to_s(op));
+    printf("0x%x %s", m.pos(), to_s(op));
 
-    if ( op==PUSH && m.ip<=end ) {
+    if ( op==PUSH && m.pos()<=end ) {
         m.next();
         printf(" 0x%x", m.cur());
 

@@ -207,7 +207,7 @@ int main(int argc, char** argv)
             exit(1);
           }
 
-          forwards.push_back(label_t(t+1, m.ip));
+          forwards.push_back(label_t(t+1, m.pos()));
         }
       }
       else
@@ -215,7 +215,7 @@ int main(int argc, char** argv)
 
       m.load(literal);
     } else if ( islabel(t) ) {
-      m.addlabel(t, m.ip);
+      m.addlabel(t, m.pos());
     } else {
       Op op = tok2op(t);
 
@@ -248,7 +248,7 @@ int main(int argc, char** argv)
     }
 
     // update label jump to address
-    m.memory[forwards[n].pos] = adr;
+    m.set_mem(forwards[n].pos, adr);
   }
   
   // now save to same name with .sm suffix
