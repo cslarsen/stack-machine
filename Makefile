@@ -1,4 +1,4 @@
-TARGETS = sm-core.o sm-util.o sm-gencode.o sm-run sm-compile sm-dis
+TARGETS = sm-core.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
@@ -9,19 +9,22 @@ sm-compile: sm-core.o sm-util.o sm-gencode.o sm-compile.cpp
 
 sm-dis: sm-core.o sm-util.o sm-dis.cpp
 
+sm-go: sm-core.o sm-util.o sm-gencode.o sm-go.cpp
+
 check: all
 	./sm-compile hello-world.txt
 	./sm-dis hello-world.sm
 	./sm-run hello-world.sm
 	./sm-run fib.sm | head -20
 	./sm-compile hello.src
-	./sm-run hello.src.sm
+	./sm-run hello.sm
 	./sm-compile hello-world.txt
-	./sm-run hello-world.txt.sm
+	./sm-run hello-world.sm
 	./sm-compile fib.src
-	./sm-run fib.src.sm
+	./sm-run fib.sm
 	./sm-compile forward-goto.src
-	./sm-run forward-goto.src.sm
+	./sm-run forward-goto.sm
+	./sm-go yo.src
 
 clean:
 	rm -f $(TARGETS) *.stackdump *.sm
