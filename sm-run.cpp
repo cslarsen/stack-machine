@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <vector>
 #include "sm-core.hpp"
+#include "sm-util.hpp"
 
 static void help()
 {

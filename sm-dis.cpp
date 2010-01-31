@@ -1,4 +1,5 @@
 #include "sm-core.hpp"
+#include "sm-util.hpp"
 
 static bool isprintable(char c)
 {

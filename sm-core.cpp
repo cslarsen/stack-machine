@@ -86,24 +86,6 @@ Op from_s(const char* s)
   return NOP_END;
 }
 
-fileptr::fileptr(FILE *file) : f(file)
-{
-  if ( f == NULL ) {
-    fprintf(stderr, "Could not open file");
-    exit(1);
-  }
-}
-
-fileptr::~fileptr()
-{
-  fclose(f);
-}
-
-fileptr::operator FILE*() const
-{
-  return f;
-}
-
 machine_t::machine_t(const size_t memory_size,
   FILE* out,
   FILE* in) :
@@ -131,6 +113,7 @@ machine_t::~machine_t()
 void machine_t::error(const char* s) const
 {
   fprintf(stderr, "%s\n", s);
+  exit(1);
   // now what?
   // - push(ip), jump to specified address, pop on return
   // - stop executing

@@ -45,14 +45,6 @@ extern const char* OpStr[];
 const char* to_s(Op op);
 Op from_s(const char* s);
 
-class fileptr {
-  FILE* f;
-public:
-  fileptr(FILE *file);
-  ~fileptr();
-  operator FILE*() const;
-};
-
 struct label_t {
   std::string name;
   int32_t pos;

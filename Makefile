@@ -1,13 +1,13 @@
-TARGETS = sm-core.o sm-run sm-compile sm-dis
+TARGETS = sm-core.o sm-util.o sm-run sm-compile sm-dis
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
 
-sm-run: sm-core.o sm-run.cpp
+sm-run: sm-core.o sm-util.o sm-run.cpp
 
-sm-compile: sm-core.o sm-compile.cpp
+sm-compile: sm-core.o sm-util.o sm-compile.cpp
 
-sm-dis: sm-core.o sm-dis.cpp
+sm-dis: sm-core.o sm-util.o sm-dis.cpp
 
 check: all
 	./sm-dis hello-world.sm
