@@ -24,4 +24,4 @@ check: all
 	./sm-run forward-goto.src.sm
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) *.stackdump *.sm
