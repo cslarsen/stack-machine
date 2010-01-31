@@ -10,6 +10,7 @@ sm-compile: sm-core.o sm-util.o sm-gencode.o sm-compile.cpp
 sm-dis: sm-core.o sm-util.o sm-dis.cpp
 
 check: all
+	./sm-compile hello-world.txt
 	./sm-dis hello-world.sm
 	./sm-run hello-world.sm
 	./sm-run fib.sm | head -20

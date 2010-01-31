@@ -46,15 +46,20 @@ static void disassemble(machine_t &m)
 
 int main(int argc, char** argv)
 {
-  for ( int n=1; n<argc; ++n ) {
-    if ( argv[n][0] != '-' ) {
-      machine_t m;
-      m.load_image(fileptr(fopen(argv[n], "rb")));
-      printf("; File %s --- %u bytes\n", argv[n], m.size());
+  try {
+    for ( int n=1; n<argc; ++n ) {
+      if ( argv[n][0] != '-' ) {
+        machine_t m;
+        m.load_image(fileptr(fopen(argv[n], "rb")));
+        printf("; File %s --- %u bytes\n", argv[n], m.size());
 
-      disassemble(m);
+        disassemble(m);
+      }
     }
+    return 0;
   }
-
-  return 0;
+  catch(const std::exception& e) {
+    fprintf(stderr, "%s\n", e.what());
+    return 1;
+  }
 }

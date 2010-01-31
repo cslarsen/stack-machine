@@ -1,4 +1,0 @@
-#!/bin/bash
-./sm-compile "${1}" &>/dev/null && \
-./sm-run "${1}.sm" && \
-rm "${1}.sm"

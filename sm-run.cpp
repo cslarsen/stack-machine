@@ -47,25 +47,31 @@ static void help()
 
 int main(int argc, char** argv)
 {
-  bool found_file = false;
+  try {
+    bool found_file = false;
 
-  for ( int n=1; n<argc; ++n ) {
-    if ( argv[n][0] == '-' ) {
-      help();
-      continue;
+    for ( int n=1; n<argc; ++n ) {
+      if ( argv[n][0] == '-' ) {
+        help();
+        continue;
+      }
+      
+      found_file = true;
+      machine_t m;
+      m.load_image(fileptr(fopen(argv[n], "rb")));
+      m.run();
     }
-    
-    found_file = true;
-    machine_t m;
-    m.load_image(fileptr(fopen(argv[n], "rb")));
-    m.run();
-  }
 
-  if ( !found_file ) {
-    machine_t m;
-    m.load_image(stdin);
-    m.run();
-  }
+    if ( !found_file ) {
+      machine_t m;
+      m.load_image(stdin);
+      m.run();
+    }
 
-  return 0;
+    return 0;
+  }
+  catch(const std::exception& e) {
+    fprintf(stderr, "%s\n", e.what());
+    return 1;
+  }
 }

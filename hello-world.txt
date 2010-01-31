@@ -1,25 +1,37 @@
 ; Hello world program
 
-push 10   ; \n
-push 33   ; !
-push 100  ; d
-push 108  ; l
-push 114  ; r
-push 111  ; o
-push 119  ; w
-push 32   ;  
-push 44   ; ,
-push 111  ; o
-push 108  ; l
-dup       ; l
-push 101  ; e
-push 72   ; H
+push '\n'
+push '!'
+push 'd'
+push 'l'
+push 'r'
+push 'o'
+push 'w'
+push 32 ; space
+push ','
+push 'o'
+push 'l'
+dup       ; duplicate 'l'
+push 'e'
+push 'H'
 
 ; print 14 characters
-out out out out
-out out out out
-out out out out
-out out
+push 14
+loop:
+  swap out
+  push 1
+  swap
+  sub
+  dup
+  push &loop
+  swap
+  jnz
 
-; halt program
+push '-' out
+push '-' out
+push '-' out
+push '-' out
+push '-' out
+push '\n' out
+
 halt
