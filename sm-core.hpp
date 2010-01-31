@@ -16,6 +16,9 @@
 #include <vector>
 #include <string>
 
+#ifndef INC_SMCORE_H
+#define INC_SMCORE_H
+
 enum Op {
   NOP,  // do nothing
   ADD,  // pop a, pop b, push a + b
@@ -58,7 +61,7 @@ struct label_t {
 class machine_t {
   std::vector<int32_t> stack;
   std::vector<label_t> labels;
-  const size_t memsize;
+  size_t memsize;
   int32_t *memory;
   int32_t ip; // instruction pointer
   FILE* fin;
@@ -70,6 +73,34 @@ public:
     const size_t memory_size = 1024*1000/sizeof(int32_t),
     FILE* out = stdout,
     FILE* in  = stdin);
+
+  machine_t(const machine_t& p) :
+    stack(p.stack),
+    labels(p.labels),
+    memsize(p.memsize),
+    memory(new int32_t[p.memsize]),
+    ip(p.ip),
+    fin(p.fin),
+    fout(p.fout),
+    running(p.running)
+  {
+    memmove(memory, p.memory, memsize*sizeof(int32_t));
+  }
+
+  machine_t& operator=(const machine_t& p)
+  {
+    delete [](memory);
+    stack = p.stack;
+    labels = p.labels;
+    memsize = p.memsize;
+    memory = new int32_t[p.memsize];
+    memmove(memory, p.memory, memsize*sizeof(int32_t));
+    ip = p.ip;
+    fin = p.fin;
+    fout = p.fout;
+    running = p.running;
+    return *this;
+  }
 
   ~machine_t();
   void reset();
@@ -102,3 +133,5 @@ public:
   void set_mem(int32_t adr, int32_t val);
   int32_t get_mem(int32_t adr) const;
 };
+
+#endif
