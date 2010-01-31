@@ -120,12 +120,12 @@ void machine_t::error(const char* s) const
   // - throw
 }
 
-void machine_t::push(const int32_t& n)
+inline void machine_t::push(const int32_t& n)
 {
   stack.push_back(n);
 }
 
-int32_t machine_t::pop()
+inline int32_t machine_t::pop()
 {
   if ( stack.size() == 0 ) {
     error("POP empty stack");
@@ -196,8 +196,7 @@ void machine_t::eval(Op op)
 
   case SUB:
     a = pop();
-    b = pop();
-    push(a-b);
+    push(a - pop());
     next();
     break;
 
@@ -245,9 +244,8 @@ void machine_t::eval(Op op)
 
   case STOR:
     a = pop();
-    b = pop();
     check_bounds(a, "STOR");
-    memory[a] = b;
+    memory[a] = pop();
     next();
     break;
 

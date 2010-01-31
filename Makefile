@@ -1,3 +1,4 @@
+CXXFLAGS = -g
 TARGETS = sm-core.o sm-util.o sm-gencode.o sm-go sm-run sm-compile sm-dis
 
 all: $(TARGETS)
