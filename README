@@ -1,8 +1,8 @@
 This project contains:
 
-- A simple, stack-based virtual machine executing low-level instructions
-- An assembler, supporting a Forth-like assembly language
-- An interpreter, being able to run compiled programs
+- A simple, stack-based virtual machine for executing low-level instructions
+- An assembler, supporting a Forth-like language
+- An interpreter, able to run compiled programs
 
 To see an example of the assembly language, take a look at the Fibonacci
 number generator in fib.src -- github users can see an online version in
