@@ -1,4 +1,5 @@
 #include "sm-gencode.hpp"
+#include "sm-util.hpp"
 
 static int lineno = 1;
 static const char WHITESPACE[] = "\r\n\t ";
@@ -13,13 +14,6 @@ static int fgetchar(FILE* f)
   int n = fgetc(f);
   if ( n=='\n' ) ++lineno;
   return n;
-}
-
-std::string toupper(const char* s)
-{
-  std::string p;
-  while ( *s ) p += toupper(*s++);
-  return p;
 }
 
 static bool char_in(char ch, const char* in)
@@ -136,7 +130,7 @@ char to_ord(const char* s, void (*compile_error)(const char* message))
     case '0': return '\0';
     }
 
-  compile_error("Unknown character literal");
+  compile_error(format("Unknown character literal '%s'", s).c_str());
 }
 
 bool islabel_ref(const char* s)
@@ -144,7 +138,7 @@ bool islabel_ref(const char* s)
   return s[0] == '&';
 }
 
-int32_t to_literal(const char* s, void (*compile_error)(const char* message))
+int32_t to_literal(const char* s, void (*compile_error)(const char* msg))
 {
   if ( isnumber(s) )
     return atoi(s);
@@ -152,12 +146,13 @@ int32_t to_literal(const char* s, void (*compile_error)(const char* message))
   if ( ischar(s) )
     return to_ord(s, compile_error);
 
-  compile_error("Unknown literal");
+  // unknown literal
+  return -1;
 }
 
 bool ishalt(const char* s)
 {
-  return toupper(s) == "HALT";
+  return upper(s) == "HALT";
 }
 
 machine_t compile(FILE* f, void (*compile_error)(const char* message))
@@ -171,41 +166,61 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
   while ( !feof(f) ) {
     skipws(f);
     const char* t = token(f);
+
     if ( t[0] == '\0' ) {
       m.load_halt();
     } else if ( iscomment(t) ) {
-      // skip to end of line
       skipto(f, "\n");
     } else if ( ishalt(t) ) {
-      // add halt function
       m.load_halt();
     } else if ( isliteral(t) ) {
-      // convert literal: 0x12 / '\n' / 0123 / 123 to number
+      // e.g. 123, 'a', '\n'
+      // convert literal to number and push it on the stack
       int32_t literal;
 
       if ( islabel_ref(t) ) {
         literal = m.get_label_address(t+1);
+
+        m.load(PUSH);
         if ( literal == -1 ) {
           // label was not found,
           // store current address and update it later on
 
-          if ( toupper(t+1) == "HERE" )
+          if ( upper(t+1) == "HERE" )
             compile_error("Label HERE is reserved");
 
           forwards.push_back(label_t(t+1, m.pos()));
         }
-      }
-      else
+        m.load(literal);
+      } else {
         literal = to_literal(t, compile_error);
 
-      m.load(literal);
+        if ( literal == -1 ) {
+          // unknown literal, but it could be a function reference... meaning we should call it
+
+          // first push return address
+          // then push destination function address (and mark it for filling in later)
+          // then jump
+          m.load(PUSHIP);
+          m.load(m.pos()+4*m.wordsize()); // return address
+          m.load(PUSH);
+          forwards.push_back(label_t(t, m.pos()));
+          m.load(literal); // destination address
+          m.load(JMP);
+
+          //compile_error(format("Unknown literal '%s' at line %d", t, get_lineno()).c_str());
+        } else {
+          m.load(PUSH); // yes; implicit push just like Forth, Postscript, etc
+          m.load(literal);
+        }
+      }
     } else if ( islabel(t) ) {
       m.addlabel(t, m.pos());
     } else {
       Op op = tok2op(t);
 
       if ( op == NOP_END )
-        compile_error("Unknown operation");
+        compile_error(format("Unknown operation on line %d", get_lineno()).c_str());
 
       m.load(op);
     }
@@ -223,7 +238,7 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
     int32_t adr = m.get_label_address(forwards[n].name.c_str());
 
     if ( adr == -1 )
-      compile_error("Code label not found");
+      compile_error(format("Code label '%s' not found", forwards[n].name.c_str()).c_str());
 
     // update label jump to address
     m.set_mem(forwards[n].pos, adr);

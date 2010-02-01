@@ -40,6 +40,8 @@ enum Op {
   OUTNUM, // pop one byte and write to stream as number
   JNZ,  // pop a, pop b, if a != 0 goto b
   DROP, // remove top of stack
+  PUSHIP, // push a in IP stack
+  POPIP,  // pop IP stack to current IP, effectively performing a jump
   NOP_END // placeholder for end of enum
 };
 
@@ -60,6 +62,7 @@ struct label_t {
 
 class machine_t {
   std::vector<int32_t> stack;
+  std::vector<int32_t> stackip;
   std::vector<label_t> labels;
   size_t memsize;
   int32_t *memory;
@@ -107,6 +110,8 @@ public:
   void error(const char* s) const;
   void push(const int32_t& n);
   int32_t pop();
+  void puship(const int32_t&);
+  int32_t popip();
   void check_bounds(int32_t n, const char* msg) const; 
   void next();
   void load(Op op);
@@ -132,6 +137,7 @@ public:
 
   void set_mem(int32_t adr, int32_t val);
   int32_t get_mem(int32_t adr) const;
+  int32_t wordsize() const;
 };
 
 #endif

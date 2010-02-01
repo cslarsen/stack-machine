@@ -49,6 +49,8 @@ const char* OpStr[] = {
   "OUTNUM",
   "JNZ",
   "DROP",
+  "PUSHIP",
+  "POPIP",
   "NOP_END"
 };
 
@@ -125,9 +127,26 @@ inline void machine_t::push(const int32_t& n)
   stack.push_back(n);
 }
 
+inline void machine_t::puship(const int32_t& n)
+{
+  stackip.push_back(n);
+}
+
+inline int32_t machine_t::popip()
+{
+  if ( stackip.empty() ) {
+    error("POP empty IP stack");
+    return 0;
+  }
+
+  int32_t n = stackip.back();
+  stackip.pop_back();
+  return n;
+}
+
 inline int32_t machine_t::pop()
 {
-  if ( stack.size() == 0 ) {
+  if ( stack.empty() ) {
     error("POP empty stack");
     return 0;
   }
@@ -227,6 +246,7 @@ void machine_t::eval(Op op)
 
   case OUT:
     putc(pop(), fout);
+    fflush(fout);
     next();
     break;
 
@@ -279,6 +299,12 @@ void machine_t::eval(Op op)
     next();
     break;
 
+  case POPIP:
+    a = popip();
+    check_bounds(a, "POPIP");
+    ip = a;
+    break;
+
   case JNZ:
     a = pop();
     b = pop();
@@ -294,6 +320,12 @@ void machine_t::eval(Op op)
   case PUSH:
     next();
     push(memory[ip]);
+    next();
+    break;
+
+  case PUSHIP:
+    next();
+    puship(memory[ip]);
     next();
     break;
 
@@ -425,4 +457,9 @@ int32_t machine_t::get_mem(int32_t adr) const
 {
   check_bounds(adr, "get_mem out of bounds");
   return memory[adr];
+}
+
+int32_t machine_t::wordsize() const
+{
+  return sizeof(int32_t);
 }

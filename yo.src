@@ -1,5 +1,5 @@
 ; simple code to demonstrate compile-and-run
-push 'y' out
-push 'o' out
-push '!' out 
-push '\n' out
+'y' out
+'o' out
+'!' out 
+'\n' out

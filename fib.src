@@ -1,43 +1,57 @@
-  nop ; make room for counter
+; Print the well-known Fibonacci sequence
+;
+; Our word size is only 32-bits, so we can't
+; count very far.
+;
+; Program starts as main:
+
+&main jmp
+
+count: ; variable for counter (or, a placeholder for a variable)
+  nop
+
+countinit:
+  46 &count stor
+  popip
+
+countget: ; ( -- counter )
+  &count load     ; load number
+  popip
+
+countdec: ; ( -- counter )
+  countget
+  1 swap sub      ; decrement by one
+  dup &count stor ; store result
+  popip
+
+show: ; print number
+  dup outnum
+  '\n' out
+  popip
+
+dup2: ; ( a b -- a b a b ) duplicate
+  swap       ; b a
+  dup        ; b a a
+  rol3       ; a a b
+  dup        ; a a b b
+  rol3       ; a b b a
+  swap       ; a b a b
+  popip
 
 main:
-  push 0                    ; first Fibonacci number
-  dup outnum push '\n' out  ; prints "0\n"
+  0 show  ; first Fibonacci number
+  1       ; second Fibonacci number
 
-  push 1                    ; second Fibonacci number
+  countinit
 
-  ; initialiez counter
+loop:
+  dup2 ; a b -- a b a b
 
-  push 46 ; print only first 45 Fibonacci numbers
-  push 0  ; address to counter
-  stor    ; store number at address 0 (which we reserved)
+  ; add top numbers and show
+  add show
 
-label:
-  swap    ; stack: 1 0
-  dup     ; stack: 1 0 0
-  rol3    ; stack: 0 0 1
-  dup     ; stack: 0 0 1 1
-  rol3    ; stack: 0 1 1 0
-  swap    ; stack: 0 1 0 1
+  ; decrement, loop if non-zero
+  countdec &loop swap jnz
 
-  ; add top two numbers
-  add     ; stack: 0 1 2
-  dup     ; stack: 0 1 2 2
-
-  ; print result
-  outnum  ; 0 1 2
-  push '\n' out
-
-  ; decrement counter
-  ; -----------------
-    
-  push 0 load       ; load number from address 0
-
-  push 1 swap sub   ; decrement by one
-  dup push 0 stor   ; store result to address 0
-
-  ; loop if not zero
-  push &label swap jnz
-
-  ; else, stop
+  ; if zero, stop
   halt

@@ -31,7 +31,7 @@ static void disassemble(machine_t &m)
     Op op = static_cast<Op>(m.cur());
     printf("0x%x %s", m.pos(), to_s(op));
 
-    if ( op==PUSH && m.pos()<=end ) {
+    if ( (op==PUSH || op==PUSHIP) && m.pos()<=end ) {
         m.next();
         printf(" 0x%x", m.cur());
 

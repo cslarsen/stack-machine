@@ -1,37 +1,37 @@
 ; Hello world program
 
-push '\n'
-push '!'
-push 'd'
-push 'l'
-push 'r'
-push 'o'
-push 'w'
-push 32 ; space
-push ','
-push 'o'
-push 'l'
+'\n'
+'!'
+'d'
+'l'
+'r'
+'o'
+'w'
+32 ; space
+','
+'o'
+'l'
 dup       ; duplicate 'l'
-push 'e'
-push 'H'
+'e'
+'H'
 
 ; print 14 characters
-push 14
+14
 loop:
   swap out
-  push 1
+  1
   swap
   sub
   dup
-  push &loop
+  &loop
   swap
   jnz
 
-push '-' out
-push '-' out
-push '-' out
-push '-' out
-push '-' out
-push '\n' out
+'-' out
+'-' out
+'-' out
+'-' out
+'-' out
+'\n' out
 
 halt

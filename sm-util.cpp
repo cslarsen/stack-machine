@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdexcept>
 #include "sm-util.hpp"
 
@@ -35,4 +36,14 @@ std::string lower(const std::string& s)
     r += tolower(*p);
 
   return r;
+}
+
+std::string format(const char* fmt, ...)
+{
+  char s[1024];
+  va_list v;
+  va_start(v, fmt);
+  vsprintf(s, fmt, v);
+  va_end(v);
+  return std::string(s);
 }
