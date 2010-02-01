@@ -21,12 +21,8 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <memory.h>
-#include <stdarg.h>
-#include <vector>
 #include "sm-core.hpp"
+#include "sm-util.hpp"
 
 const char* OpStr[] = {
   "NOP",
@@ -59,13 +55,6 @@ const char* to_s(Op op)
   if ( op >= NOP && op < NOP_END )
     return OpStr[op];
   return "<?>";
-}
-
-static std::string toupper(const char* s)
-{
-  std::string p;
-  while ( *s ) p += toupper(*s++);
-  return p;
 }
 
 Op from_s(const char* s)
@@ -116,10 +105,6 @@ void machine_t::error(const char* s) const
 {
   fprintf(stderr, "%s\n", s);
   exit(1);
-  // now what?
-  // - push(ip), jump to specified address, pop on return
-  // - stop executing
-  // - throw
 }
 
 inline void machine_t::push(const int32_t& n)
@@ -189,14 +174,6 @@ int machine_t::run(int32_t start_address)
 
   while(running)
     eval(static_cast<Op>(memory[ip]));
-}
-
-void machine_t::showstack() const
-{
-  printf("Stack: ");
-  for ( int n=0; n < stack.size(); ++n )
-    printf("%d ", stack[n]);
-  printf("\n");
 }
 
 void machine_t::eval(Op op)
@@ -413,20 +390,21 @@ int32_t machine_t::pos() const
 
 void machine_t::addlabel(const char* name, int32_t pos)
 {
-  std::string n = toupper(name);
+  std::string n = upper(name);
   n.erase(n.length()-1, 1); // remove ":"
   labels.push_back(label_t(n.c_str(), pos));
 }
 
 int32_t machine_t::get_label_address(const char* s) const
 {
-  std::string p = toupper(s);
+  std::string p = upper(s);
 
   // special label address "here" returns current position
-  if ( p == "HERE" ) return ip;
+  if ( p == "HERE" )
+    return ip;
 
   for ( int n=0; n < labels.size(); ++n )
-    if ( toupper(labels[n].name.c_str()) == p )
+    if ( upper(labels[n].name.c_str()) == p )
       return labels[n].pos;
   
   return -1; // not found
