@@ -1,0 +1,22 @@
+  ; program starts at main program
+  main
+  '4' out '\n' out
+  halt
+
+three:
+  '3' out '\n' out
+  popip
+
+main:
+  one
+  two
+  three
+  popip
+
+one:
+  '1' out '\n' out
+  popip
+
+two:
+  '2' out '\n' out
+  popip

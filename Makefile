@@ -26,6 +26,7 @@ check: all
 	./sm-compile forward-goto.src
 	./sm-run forward-goto.sm
 	./sm-go yo.src
+	./sm-go func.src
 
 clean:
 	rm -f $(TARGETS) *.stackdump *.sm
