@@ -1,19 +1,30 @@
 This is a very simple stack-based virtual machine, written in C++.
 
-The word length is currently 32-bit, you have 1 Mb at your disposal
-for text and memory.  The opcodes can be found by compiling and
-running:
+It contains a virtual machine, as well as an assembler with a language
+that is a superset of the low level instructions.  To see an example of
+this Forth-like language, take a look at the file fib.src (on github
+you can see the file fib.txt).
+
+The word length is currently 32-bit, and you have by default 1 Mb at
+your disposal for text and memory.  They both share the same memory
+space, so you can easily write self-modifying code.
+
+There are two stacks; one for data and one for the instruction pointer.
+These live in different memory regions, and by the current implementation
+have no real limits.
+
+To compile and see the low-level instructions, do:
 
   make all
   ./sm-run -h
 
-To test out some programs:
+To run a set of example programs:
 
   make all check
 
-A working, but incomplete, assembler can be found in sm-compile.cpp.
-An example hello world program can be found in hello.src, with a
-Fibonacci number generator in compiled bytecode in fib.sm.
+The assembler instructions are not documented other than in the example
+codes and in sm-compile.cpp.  This is because this language will change
+a lot while I'm playing around.
 
 Placed in the public domain in 2010 by the author, Christian Stigen Larsen
 http://csl.sublevel3.org
