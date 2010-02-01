@@ -32,7 +32,8 @@ static void skip(FILE* f, const char* chars)
     && char_in(ch, chars) )
       ; // loop
 
-  if ( ch == '\n' ) --lineno;
+  if ( ch == '\n' )
+    --lineno;
   ungetc(ch, f);
 }
 
@@ -56,17 +57,20 @@ static void skipws(FILE* f)
 static const char* token(FILE* f)
 {
   static char tok[256];
-  tok[0] = '\0';
-  skipws(f);
   char* p = &tok[0];
   int ch;
-  while ( (ch = fgetchar(f)) != EOF && !char_in(ch, WHITESPACE)
+
+  tok[0] = '\0';
+  skipws(f);
+
+  while ( (ch = fgetchar(f)) != EOF
+      && !char_in(ch, WHITESPACE)
       && p-tok<sizeof(tok) )
   {
       *p++ = ch;
   }
-  *p = '\0';
 
+  *p = '\0';
   return tok;
 }
 
@@ -90,6 +94,7 @@ bool isliteral(const char* token)
 {
   if ( islabel(token) )
     return false;
+
   return tok2op(token) == NOP_END;
 }
 
@@ -196,21 +201,31 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
         literal = to_literal(t, compile_error);
 
         if ( literal == -1 ) {
-          // unknown literal, but it could be a function reference... meaning we should call it
+          // Unknown literal, but it could be a function
+          // reference ... meaning we should call it
 
-          // first push return address
+          // First push return address
           // then push destination function address (and mark it for filling in later)
           // then jump
+
+          // Push return address (4*wordsize -> continue after the last JMP here)
           m.load(PUSHIP);
-          m.load(m.pos()+4*m.wordsize()); // return address
+          m.load(m.pos()+4*m.wordsize());
+
+          // Push destination address, which we will
+          // fill out later with `forwards´
           m.load(PUSH);
           forwards.push_back(label_t(t, m.pos()));
-          m.load(literal); // destination address
+          m.load(literal);
+
+          // Perform the jump
           m.load(JMP);
 
-          //compile_error(format("Unknown literal '%s' at line %d", t, get_lineno()).c_str());
+          // 4*wordsize is here -- the point we'll return with POPIP
+
         } else {
-          m.load(PUSH); // yes; implicit push just like Forth, Postscript, etc
+          // Perform implicit push of words, just like Forth, Postscript, etc.
+          m.load(PUSH);
           m.load(literal);
         }
       }
@@ -224,16 +239,13 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
 
       m.load(op);
     }
-
   }
 
-  // just in case, add a halt instruction
+  // Add a halt instruction, just in case
   m.load_halt();
 
-  // now update all forward jumps, since
-  // we now know all code labels.
-  // If a label is not found this time,
-  // we should raise an error
+  // Update all forwards jumps, since we now know all
+  // code labels.
   for ( int n=0; n<forwards.size(); ++n ) {
     int32_t adr = m.get_label_address(forwards[n].name.c_str());
 
@@ -246,5 +258,3 @@ machine_t compile(FILE* f, void (*compile_error)(const char* message))
  
   return m;
 }
-
-
