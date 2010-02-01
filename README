@@ -13,11 +13,11 @@ Instructions are 32-bits wide, and so are arithmetic operands.
 By default, programs have 1 Mb available for text and data.  They occupy
 the same memory space, so you can easily write self-modifying code.
 
-There are two stacks; one for data, one for the instruction pointer.  The
-stacks live separate from text and data, and is limited by the process
-heap size.
+There are two stacks; one for the instruction pointer, and one for the data.
+They live separately from the text and data region, and are only limited by
+process heap sizes.
 
-To compile and run examples:
+To compile and run the examples:
 
   make all check
 
