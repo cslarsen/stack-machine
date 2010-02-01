@@ -1,30 +1,36 @@
-This is a very simple stack-based virtual machine, written in C++.
+This project contains:
 
-It contains a virtual machine, as well as an assembler with a language
-that is a superset of the low level instructions.  To see an example of
-this Forth-like language, take a look at the file fib.src (on github
-you can see the file fib.txt).
+- A simple, stack-based virtual machine executing low-level instructions
+- An assembler, supporting a Forth-like assembly language
+- An interpreter, being able to run compiled programs
 
-The word length is currently 32-bit, and you have by default 1 Mb at
-your disposal for text and memory.  They both share the same memory
-space, so you can easily write self-modifying code.
+To see an example of the assembly language, take a look at the Fibonacci
+number generator in fib.src -- github users can see an online version in
+fib.txt.
 
-There are two stacks; one for data and one for the instruction pointer.
-These live in different memory regions, and by the current implementation
-have no real limits.
+Instructions are 32-bits wide, and so are arithmetic operands.
 
-To compile and see the low-level instructions, do:
+By default, programs have 1 Mb available for text and data.  They occupy
+the same memory space, so you can easily write self-modifying code.
 
-  make all
-  ./sm-run -h
+There are two stacks; one for data, one for the instruction pointer.  The
+stacks live separate from text and data, and is limited by the process
+heap size.
 
-To run a set of example programs:
+To compile and run examples:
 
   make all check
 
-The assembler instructions are not documented other than in the example
-codes and in sm-compile.cpp.  This is because this language will change
-a lot while I'm playing around.
+To see the low-level machine instructions:
+
+  ./sm-run -h
+
+The assembly language is not documented other than in code, because I'm
+actively playing with it.
+
+Although the interpreter is slow, it should be possible to convert stack
+operations to a register machine.  In fact, it should be trivial to compile
+programs to native machine code, e.g. x86.
 
 Placed in the public domain in 2010 by the author, Christian Stigen Larsen
 http://csl.sublevel3.org
