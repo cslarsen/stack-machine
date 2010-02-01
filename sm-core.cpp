@@ -47,6 +47,7 @@ const char* OpStr[] = {
   "DROP",
   "PUSHIP",
   "POPIP",
+  "DROPIP",
   "NOP_END"
 };
 
@@ -280,6 +281,11 @@ void machine_t::eval(Op op)
     a = popip();
     check_bounds(a, "POPIP");
     ip = a;
+    break;
+
+  case DROPIP:
+    popip();
+    next();
     break;
 
   case JNZ:

@@ -72,6 +72,10 @@ dup2: ; ( a b -- a b a b ) duplicate
   swap       ; a b a b
   popip
 
+jump-if-nonzero: ; ( a -- )
+  swap jnz
+  popip
+  
 ; The start of our Fibonacci printing program
 
 main:
@@ -86,8 +90,4 @@ main:
     dup2 add show
 
     ; decrement, loop if non-zero
-    count-dec
-    &loop swap jnz
-
-    ; if zero, stop
-    halt
+    count-dec &loop jump-if-nonzero

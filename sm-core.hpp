@@ -42,6 +42,7 @@ enum Op {
   DROP, // remove top of stack
   PUSHIP, // push a in IP stack
   POPIP,  // pop IP stack to current IP, effectively performing a jump
+  DROPIP, // pop IP, but do not jump
   NOP_END // placeholder for end of enum
 };
 
