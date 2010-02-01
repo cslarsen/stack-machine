@@ -21,7 +21,7 @@ count:
 ; POPIP will pop the instruction pointer, effectively jumping to
 ; the next location (probably the caller).
 
-countinit:
+count-init:
   46 &count stor
   popip
 
@@ -31,7 +31,7 @@ countinit:
 ; that no number is expected on the stack, and after running this function,
 ; a number ("counter") will be on the stack.
 
-countget: ; ( -- counter )
+count-get: ; ( -- counter )
   &count load     ; load number
   popip
 
@@ -43,15 +43,15 @@ dec: ; ( a -- a-1 )
 
 ; Store top of stack to 'count', do not alter stack
 
-storecount: ; ( counter -- counter )
+count-set: ; ( counter -- counter )
   dup &count stor
   popip
 
 ; Decrement counter and return it
 
-countdec: ; ( -- counter )
-  countget dec
-  storecount
+count-dec: ; ( -- counter )
+  count-get dec
+  count-set
   popip
 
 ; Print number with a newline without altering stack
@@ -75,19 +75,18 @@ dup2: ; ( a b -- a b a b ) duplicate
 ; The start of our Fibonacci printing program
 
 main:
-  countinit
+  count-init
 
   0 show  ; first Fibonacci number
   1       ; second Fibonacci number
 
   loop:
-    dup2 ; a b -- a b a b
-
     ; add top numbers and show
-    add show ; a b a b -- a b (a+b)
+    ; a b -> a b a b -> a b (a + b)
+    dup2 add show
 
     ; decrement, loop if non-zero
-    countdec
+    count-dec
     &loop swap jnz
 
     ; if zero, stop

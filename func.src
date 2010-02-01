@@ -1,4 +1,4 @@
-  ; program starts at main program
+; program starts at main program
   main
   '4' out '\n' out
   halt
