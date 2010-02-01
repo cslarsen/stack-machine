@@ -1,0 +1,94 @@
+; Print the well-known Fibonacci sequence
+;
+; Our word size is only 32-bits, so we can't
+; count very far.
+
+; Program starts as main, so jump there
+
+&main jmp
+
+; Create label 'count', which refers to this memory
+; address.
+;
+; The NOP (no operation; do nothing) is only used
+; to reserve memory space for a variable.
+
+count:
+  nop
+
+; Initialize the counter by storing 46 at the address of 'count'.
+;
+; POPIP will pop the instruction pointer, effectively jumping to
+; the next location (probably the caller).
+
+countinit:
+  46 &count stor
+  popip
+
+; Shorthand for loading the number at 'count' onto the top of the stack.
+;
+; The "( -- counter)" comment is similar to Forth's comments, explaining
+; that no number is expected on the stack, and after running this function,
+; a number ("counter") will be on the stack.
+
+countget: ; ( -- counter )
+  &count load     ; load number
+  popip
+
+; Shorthand for decrementing the number on the stack
+
+dec: ; ( a -- a-1 )
+  1 swap sub
+  popip
+
+; Store top of stack to 'count', do not alter stack
+
+storecount: ; ( counter -- counter )
+  dup &count stor
+  popip
+
+; Decrement counter and return it
+
+countdec: ; ( -- counter )
+  countget dec
+  storecount
+  popip
+
+; Print number with a newline without altering stack
+
+show: ; ( number -- number )
+  dup outnum
+  '\n' out
+  popip
+
+; Duplicate top two most numbers on stack
+
+dup2: ; ( a b -- a b a b ) duplicate
+  swap       ; b a
+  dup        ; b a a
+  rol3       ; a a b
+  dup        ; a a b b
+  rol3       ; a b b a
+  swap       ; a b a b
+  popip
+
+; The start of our Fibonacci printing program
+
+main:
+  countinit
+
+  0 show  ; first Fibonacci number
+  1       ; second Fibonacci number
+
+  loop:
+    dup2 ; a b -- a b a b
+
+    ; add top numbers and show
+    add show ; a b a b -- a b (a+b)
+
+    ; decrement, loop if non-zero
+    countdec
+    &loop swap jnz
+
+    ; if zero, stop
+    halt
