@@ -9,7 +9,7 @@ static bool isprintable(char c)
     || c=='\t';
 }
 
-static const char* printable(char c)
+static const char* to_s(char c)
 {
   static char buf[2];
   buf[0] = c;
@@ -36,7 +36,7 @@ static void disassemble(machine_t &m)
         printf(" 0x%x", m.cur());
 
         if ( isprintable(m.cur()) )
-          printf(" ('%s')", printable(m.cur()));
+          printf(" ('%s')", to_s(m.cur()));
     }
 
     printf("\n");
@@ -48,18 +48,17 @@ int main(int argc, char** argv)
 {
   try {
     for ( int n=1; n<argc; ++n ) {
-      if ( argv[n][0] != '-' ) {
-        machine_t m;
-        m.load_image(fileptr(fopen(argv[n], "rb")));
-        printf("; File %s --- %u bytes\n", argv[n], m.size());
+      if ( argv[n][0] == '-' )
+        continue;
 
-        disassemble(m);
-      }
+      machine_t m;
+      m.load_image(fileptr(fopen(argv[n], "rb")));
+      printf("; File %s --- %u bytes\n", argv[n], m.size());
+      disassemble(m);
     }
     return 0;
   }
   catch(const std::exception& e) {
-    fprintf(stderr, "%s\n", e.what());
-    return 1;
+    error(e.what());
   }
 }
