@@ -139,6 +139,31 @@ public:
   void set_mem(int32_t adr, int32_t val);
   int32_t get_mem(int32_t adr) const;
   int32_t wordsize() const;
+
+  // instructions
+  void instr_nop();    
+  void instr_add();    
+  void instr_sub();    
+  void instr_and();    
+  void instr_or();     
+  void instr_xor();    
+  void instr_not();    
+  void instr_in();     
+  void instr_out();    
+  void instr_outnum(); 
+  void instr_load();   
+  void instr_stor();   
+  void instr_jmp();    
+  void instr_jz();     
+  void instr_drop();   
+  void instr_popip();  
+  void instr_dropip(); 
+  void instr_jnz();    
+  void instr_push();   
+  void instr_puship();  
+  void instr_dup();    
+  void instr_swap();   
+  void instr_rol3();   
 };
 
 #endif

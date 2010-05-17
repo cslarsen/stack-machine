@@ -55,26 +55,19 @@ const char* to_s(Op op)
 {
   if ( op >= NOP && op < NOP_END )
     return OpStr[op];
+
   return "<?>";
 }
 
-Op from_s(const char* s)
+Op from_s(const char* str)
 {
-  int l = strlen(s);
-  char* p = static_cast<char*>(malloc(l+1));
-  strcpy(p, s);
-  for ( char* d=p; *d; ++d )
-    if ( *d>='a' && *d<='z' )
-      *d = *d - 'a' + 'A';
+  std::string s(upper(str));
 
-  // p is now uppercase of s
+  // slow, O(n/2) seek... :-)
   for ( int n=0; n<NOP_END; ++n )
-    if ( !strcmp(p, OpStr[n]) ) {
-      free(p);
+    if ( s == OpStr[n] )
       return static_cast<Op>(n);
-    }
 
-  free(p);
   return NOP_END;
 }
 
@@ -104,8 +97,7 @@ machine_t::~machine_t()
 
 void machine_t::error(const char* s) const
 {
-  fprintf(stderr, "%s\n", s);
-  exit(1);
+  ::error(s);
 }
 
 inline void machine_t::push(const int32_t& n)
@@ -132,10 +124,8 @@ inline int32_t machine_t::popip()
 
 inline int32_t machine_t::pop()
 {
-  if ( stack.empty() ) {
+  if ( stack.empty() )
     error("POP empty stack");
-    return 0;
-  }
 
   int32_t n = stack.back();
   stack.pop_back();
@@ -144,17 +134,16 @@ inline int32_t machine_t::pop()
 
 void machine_t::check_bounds(int32_t n, const char* msg) const
 {
-  if ( n>=0 && n<memsize )
-    return;
-
-  error(msg);
+  if ( n<0 || n>=memsize )
+    error(msg);
 }
 
 void machine_t::next()
 {
   ip += sizeof(int32_t);
+
   if ( ip >= memsize )
-    ip = 0;
+    ip = 0; // todo: or halt?
 }
 
 void machine_t::load(Op op)
@@ -177,165 +166,215 @@ int machine_t::run(int32_t start_address)
     eval(static_cast<Op>(memory[ip]));
 }
 
+void machine_t::instr_nop()
+{
+  next();
+}
+
+void machine_t::instr_add()
+{
+  push(pop() + pop());
+  next();
+}
+
+void machine_t::instr_sub()
+{
+  int32_t tos = pop();
+  push(tos - pop());
+  next();
+}
+
+void machine_t::instr_and()
+{
+  push(pop() & pop());
+  next();
+}
+
+void machine_t::instr_or()
+{
+  push(pop() | pop());
+  next();
+}
+
+void machine_t::instr_xor()
+{
+  push(pop() ^ pop());
+  next();
+}
+
+void machine_t::instr_not()
+{
+  // todo: this probably does not
+  //       work as intended
+  push(!pop());
+  next();
+}
+
+void machine_t::instr_in()
+{
+  push(getc(fin));
+  next();
+}
+
+void machine_t::instr_out()
+{
+  putc(pop(), fout);
+  fflush(fout);
+  next();
+}
+
+void machine_t::instr_outnum()
+{
+  fprintf(fout, "%u", pop());
+  next();
+}
+
+void machine_t::instr_load()
+{
+  int32_t a = pop();
+  check_bounds(a, "LOAD");
+  push(memory[a]);
+  next();
+}
+
+void machine_t::instr_stor()
+{
+  int32_t a = pop();
+  check_bounds(a, "STOR");
+  memory[a] = pop();
+  next();
+}
+
+void machine_t::instr_jmp()
+{
+  int32_t a = pop();
+  check_bounds(a, "JMP");  
+
+  // check if we are halting, i.e. jumping to current
+  // address -- if so, quit
+  if ( a == ip )
+    running = false;
+  else
+    ip = a;
+}
+
+void machine_t::instr_jz()
+{
+  int32_t a = pop();
+  int32_t b = pop();
+
+  if ( a != 0 )
+    next();
+  else {
+    check_bounds(b, "JZ");
+    ip = b; // perform jump
+  }
+}
+
+void machine_t::instr_drop()
+{
+  pop();
+  next();
+}
+
+void machine_t::instr_popip()
+{
+  int32_t a = popip();
+  check_bounds(a, "POPIP");
+  ip = a;
+}
+
+void machine_t::instr_dropip()
+{
+  popip();
+  next();
+}
+
+void machine_t::instr_jnz()
+{
+  int32_t a = pop();
+  int32_t b = pop();
+
+  if ( a == 0 )
+    next();
+  else {
+    check_bounds(b, "JNZ");
+    ip = b; // jump
+  }
+}
+
+void machine_t::instr_push()
+{
+  next();
+  push(memory[ip]);
+  next();
+}
+
+void machine_t::instr_puship()
+{
+  next();
+  puship(memory[ip]);
+  next();
+}
+
+void machine_t::instr_dup()
+{
+  int32_t a = pop();
+  push(a);
+  push(a);
+  next();
+}
+
+void machine_t::instr_swap()
+{
+  // a, b -- b, a
+  int32_t b = pop();
+  int32_t a = pop();
+  push(b);
+  push(a);
+  next();
+}
+
+void machine_t::instr_rol3()
+{
+  // abc -> bca
+  int32_t c = pop(); // TOS
+  int32_t b = pop();
+  int32_t a = pop();
+  push(b);
+  push(c);
+  push(a);
+  next();
+}
+
 void machine_t::eval(Op op)
 {
   int32_t a=NOP, b=NOP, c=NOP;
 
   switch(op) {
-  case NOP:
-    next();
-    break;
-
-  case ADD:
-    push(pop() + pop());
-    next();
-    break;
-
-  case SUB:
-    a = pop();
-    push(a - pop());
-    next();
-    break;
-
-  case AND:
-    push(pop() & pop());
-    next();
-    break;
-
-  case OR:
-    push(pop() | pop());
-    next();
-    break;
-
-  case XOR:
-    push(pop() ^ pop());
-    next();
-    break;
-
-  case NOT:
-    push(!pop());
-    next();
-    break;
-
-  case IN:
-    push(getc(fin));
-    next();
-    break;
-
-  case OUT:
-    putc(pop(), fout);
-    fflush(fout);
-    next();
-    break;
-
-  case OUTNUM:
-    fprintf(fout, "%u", pop());
-    next();
-    break;
-
-  case LOAD:
-    a = pop();
-    check_bounds(a, "LOAD");
-    push(memory[a]);
-    next();
-    break;
-
-  case STOR:
-    a = pop();
-    check_bounds(a, "STOR");
-    memory[a] = pop();
-    next();
-    break;
-
-  case JMP:
-    a = pop();
-    check_bounds(a, "JMP");  
-
-    // check if we are halting, i.e. jumping to current
-    // address -- if so, quit
-    if ( a == ip )
-      running = false;
-    else
-      ip = a;
-
-    break;
-
-  case JZ:
-    a = pop();
-    b = pop();
-
-    if ( a != 0 )
-      next();
-    else {
-      check_bounds(b, "JZ");
-      ip = b; // jump
-    }
-    break;
-
-  case DROP:
-    pop();
-    next();
-    break;
-
-  case POPIP:
-    a = popip();
-    check_bounds(a, "POPIP");
-    ip = a;
-    break;
-
-  case DROPIP:
-    popip();
-    next();
-    break;
-
-  case JNZ:
-    a = pop();
-    b = pop();
-
-    if ( a == 0 )
-      next();
-    else {
-      check_bounds(b, "JNZ");
-      ip = b; // jump
-    }
-    break;
-
-  case PUSH:
-    next();
-    push(memory[ip]);
-    next();
-    break;
-
-  case PUSHIP:
-    next();
-    puship(memory[ip]);
-    next();
-    break;
-
-  case DUP:
-    a = pop();
-    push(a);
-    push(a);
-    next();
-    break;
-
-  case SWAP: // a, b -- b, a
-    b = pop();
-    a = pop();
-    push(b);
-    push(a);
-    next();
-    break;
-
-  case ROL3: // abc -> bca
-    c = pop();
-    b = pop();
-    a = pop();
-    push(b);
-    push(c);
-    push(a);
-    next();
-    break;
+  case NOP:    instr_nop();    break;
+  case ADD:    instr_add();    break;
+  case SUB:    instr_sub();    break;
+  case AND:    instr_and();    break;
+  case OR:     instr_or();     break;
+  case XOR:    instr_xor();    break;
+  case NOT:    instr_not();    break;
+  case IN:     instr_in();     break;
+  case OUT:    instr_out();    break;
+  case OUTNUM: instr_outnum(); break;
+  case LOAD:   instr_load();   break;
+  case STOR:   instr_stor();   break;
+  case JMP:    instr_jmp();    break;
+  case JZ:     instr_jz();     break;
+  case DROP:   instr_drop();   break;
+  case POPIP:  instr_popip();  break;
+  case DROPIP: instr_dropip(); break;
+  case JNZ:    instr_jnz();    break;
+  case PUSH:   instr_push();   break;
+  case PUSHIP: instr_puship(); break;
+  case DUP:    instr_dup();    break;
+  case SWAP:   instr_swap();   break;
+  case ROL3:   instr_rol3();   break;
   }
 }
 
