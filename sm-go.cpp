@@ -25,12 +25,6 @@
 #include "sm-util.hpp"
 #include "sm-gencode.hpp"
 
-void error(const char* msg)
-{
-  fprintf(stderr, "%s\n", msg);
-  exit(1);
-}
-
 int main(int argc, char** argv)
 {
   try {

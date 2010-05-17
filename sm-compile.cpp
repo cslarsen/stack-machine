@@ -1,20 +1,7 @@
-#include <string>
-#include <vector>
+#include <stdexcept>
 #include "sm-core.hpp"
 #include "sm-util.hpp"
 #include "sm-gencode.hpp"
-
-void error(const char* s)
-{
-  fprintf(stderr, "\n%s\n", s);
-  exit(1);
-}
-
-std::string basename(const std::string& s)
-{
-  std::string::size_type p = s.rfind('.');
-  return p == std::string::npos ? s : s.substr(0, p);
-}
 
 int main(int argc, char** argv)
 {
