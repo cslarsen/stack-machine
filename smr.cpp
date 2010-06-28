@@ -26,9 +26,9 @@ static void help()
   } while ( op != NOP_END );
 
   printf("\nTo halt program, jump to current position:\n\n");
-  printf("0x0 PUSH 0x%x\n", sizeof(int32_t));
-  printf("0x%x JMP\n\n", sizeof(int32_t));
-  printf("Word size is %d bytes\n", sizeof(int32_t));
+  printf("0x0 PUSH 0x%x\n", (unsigned int)sizeof(int32_t));
+  printf("0x%x JMP\n\n", (unsigned int)sizeof(int32_t));
+  printf("Word size is %lu bytes\n", sizeof(int32_t));
 
   exit(0);
 }
