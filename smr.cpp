@@ -20,6 +20,8 @@ static void help()
   printf("smr -- stack-machine run\n");
   printf("%s\n\n", VERSION);
 
+  printf("Instruction set architecture:\n\n");
+
   Op op=NOP; 
   do {
     printf("0x%x = %s\n", op, to_s(op));
