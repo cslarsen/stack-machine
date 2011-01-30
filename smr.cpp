@@ -17,6 +17,7 @@
 
 static void help()
 {
+  printf("smr -- stack-machine run\n");
   printf("%s\n\n", VERSION);
 
   Op op=NOP; 

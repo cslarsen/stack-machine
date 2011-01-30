@@ -57,12 +57,22 @@ static void disassemble(machine_t &m)
   }
 }
 
+int help()
+{
+  printf("Usage: smd [ file(s) }\n\n");
+  printf("Disassembles compiled bytecode files.\n");
+  exit(1);
+}
+
 int main(int argc, char** argv)
 {
   try {
     for ( int n=1; n<argc; ++n ) {
-      if ( argv[n][0] == '-' )
+      if ( argv[n][0] == '-' ) {
+        if ( argv[n][1] != '\0' )
+          help();
         continue;
+      }
 
       machine_t m;
       m.load_image(fileptr(fopen(argv[n], "rb")));

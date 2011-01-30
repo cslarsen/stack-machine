@@ -47,7 +47,6 @@ int main(int argc, char** argv)
       error("Usage: smc [ filename(s) | - ]\n" VERSION);
 
     for ( int n=1; n<argc; ++n ) {
-
       if ( !strcmp(argv[n], "-") ) {
         file = "<stdin>";
         compile(stdin, "out.sm");

@@ -23,6 +23,13 @@ void compile_and_run(FILE* f)
   c.get_program().run();
 }
 
+void help()
+{
+  printf("Usage: sm [ file(s] ]\n");
+  printf("Compiles and runs source files on the fly.\n\n");
+  exit(1);
+}
+
 int main(int argc, char** argv)
 {
   try {
@@ -30,9 +37,12 @@ int main(int argc, char** argv)
       compile_and_run(stdin);
   
     for ( int n=1; n<argc; ++n )
-      if ( !strcmp(argv[n], "-") )
-        compile_and_run(stdin);
-      else
+      if ( argv[n][0]=='-' ) {
+        if ( argv[n][1] == '\0' )
+          compile_and_run(stdin);
+        else
+          help();
+      } else
         compile_and_run(fileptr(fopen(argv[n], "rt")));
 
     return 0;
