@@ -14,7 +14,7 @@
 #include "fileptr.hpp"
 #include "error.hpp"
 
-static bool isprintable(char c)
+static bool isprintable(int c)
 {
   return (c>=32 && c<=127)
     || c=='\n'
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 
       machine_t m;
       m.load_image(fileptr(fopen(argv[n], "rb")));
-      printf("; File %s --- %u bytes\n", argv[n], m.size());
+      printf("; File %s --- %lu bytes\n", argv[n], m.size());
       disassemble(m);
     }
     return 0;
