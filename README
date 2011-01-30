@@ -15,7 +15,7 @@ the same memory space, so you can easily write self-modifying code.
 
 There are two stacks; one for the instruction pointer, and one for the data.
 They live separately from the text and data region, and are only limited by
-process heap sizes.
+the host process heap size.
 
 To compile and run the examples:
 
