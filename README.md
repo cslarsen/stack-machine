@@ -11,19 +11,19 @@ The instructions are fixed-width at 32-bits and so are the arithmetic
 operands.
 
 By default, programs have 1 million cells available for both program text
-and data.  This means that a virtual machine memory takes up 4MB, plus the
+and data.  This means that a virtual machine memory takes up 4MB plus the
 data and instruction stacks.
 
-The text and data region are overlapped, so you easily write self-modifying
+The text and data regions are overlapped, so you easily write self-modifying
 code (early versions actually required self-modification to be able to
-return from subroutine calls).
+return from subroutine calls, just like Knuth's MIX).
 
 There are two stacks; one for the instruction pointer and one for the data.
 They live separately from the text and data region, and are only limited by
 the host process heap size.
 
-The assembly language
-=====================
+The programming language
+========================
 
 The language is very similar to Forth and PostScript:  You basically write
 in RPN --- reverse Polish notation.  Anything not recognized as an
