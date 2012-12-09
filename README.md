@@ -7,6 +7,9 @@ This project contains
   * An assembler supporting a Forth / PostScript like language
   * An interpreter able to run compiled programs
 
+Architecture and design
+-----------------------
+
 The instructions are fixed-width at 32-bits and so are the arithmetic
 operands.
 
@@ -20,16 +23,56 @@ be able to return from subroutine calls, just like Knuth's MIX, but I've
 since taken liberty to add such modern convenience into the core instruction
 set).
 
-There are two stacks; one for the instruction pointer and one for the data.
-They live separately from the text and data region, and are only limited by
-the host process heap size.
+There are no registers.  This _is_ a stack machine, after all.
+
+As we know from theoretical computer science, a pushdown automaton needs
+_two_ stacks to be Turing equivalent.  Therefore we employ two as well; one
+for the instruction pointer and one for the data.  They live separately from
+the text and data region, and are only limited by the host process heap
+size.
 
 The machine contains no special facilities besides this:  It's inherently
-single-threaded and has absolutely no concept of execution protection
-(though, it's fairly well sandboxed from your host system).
+single-threaded and has no protection mechanisms.  Its operation is
+completely sandboxed, though, except for access to standard output.
+
+Aim
+---
 
 The project aim was to create a simple machine and language to play around
-with.
+with.  You can benefit from it by reading the source code, playing with a
+language similar to Forth, but conceptually simpler, and finally by seeing
+how easy it is to build your own system.
+
+Instruction set
+---------------
+
+The instructions are found `include/instructions.hpp`:
+
+    NOP,  // do nothing
+    ADD,  // pop a, pop b, push a + b
+    SUB,  // pop a, pop b, push a - b
+    AND,  // pop a, pop b, push a & b
+    OR,   // pop a, pop b, push a | b
+    XOR,  // pop a, pop b, push a ^ b
+    NOT,  // pop a, push !a
+    IN,   // push one byte read from stream
+    OUT,  // pop one byte and write to stream
+    LOAD, // pop a, push byte read from address a
+    STOR, // pop a, pop b, write b to address a
+    JMP,  // pop a, goto a
+    JZ,   // pop a, pop b, if a == 0 goto b
+    PUSH, // push next word
+    DUP,  // duplicate word on stack
+    SWAP, // swap top two words on stack
+    ROL3, // rotate top three words on stack once left, (a b c) -> (b c a)
+    OUTNUM, // pop one byte and write to stream as number
+    JNZ,  // pop a, pop b, if a != 0 goto b
+    DROP, // remove top of stack
+    PUSHIP, // push a in IP stack
+    POPIP,  // pop IP stack to current IP, effectively performing a jump
+    DROPIP, // pop IP, but do not jump
+    COMPL,  // pop a, push the complement of a
+    NOP_END // placeholder for end of enum; MUST BE LAST
 
 The programming language
 ========================
@@ -372,37 +415,6 @@ first.  So I implemented `OUTNUM` that prints a number to the output:
 
 Lacking is proper string handling.  One could say that string handling is
 not this language's strongest point.
-
-Instruction set
----------------
-
-The instructions are found `include/instructions.hpp`:
-
-    NOP,  // do nothing
-    ADD,  // pop a, pop b, push a + b
-    SUB,  // pop a, pop b, push a - b
-    AND,  // pop a, pop b, push a & b
-    OR,   // pop a, pop b, push a | b
-    XOR,  // pop a, pop b, push a ^ b
-    NOT,  // pop a, push !a
-    IN,   // push one byte read from stream
-    OUT,  // pop one byte and write to stream
-    LOAD, // pop a, push byte read from address a
-    STOR, // pop a, pop b, write b to address a
-    JMP,  // pop a, goto a
-    JZ,   // pop a, pop b, if a == 0 goto b
-    PUSH, // push next word
-    DUP,  // duplicate word on stack
-    SWAP, // swap top two words on stack
-    ROL3, // rotate top three words on stack once left, (a b c) -> (b c a)
-    OUTNUM, // pop one byte and write to stream as number
-    JNZ,  // pop a, pop b, if a != 0 goto b
-    DROP, // remove top of stack
-    PUSHIP, // push a in IP stack
-    POPIP,  // pop IP stack to current IP, effectively performing a jump
-    DROPIP, // pop IP, but do not jump
-    COMPL,  // pop a, push the complement of a
-    NOP_END // placeholder for end of enum; MUST BE LAST
 
 Compiling the project
 =====================
