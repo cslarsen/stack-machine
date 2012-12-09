@@ -39,8 +39,8 @@ with the result of the multiplication.  Also, comments are introduced with
 semicolons.
 
 Well, except --- there really is no multiplication instruction.  But it's
-fairly easy to create one.  I've actually bothered to create one from you
-and put it into the `core` library.  It's called `mul`, from
+fairly easy to create one.  I've actually bothered to create one for you and
+put it into the `core` library.  It's called `mul` / `*`, from
 `tests/core.src`:
 
     mul:            ; ( a b -- (a*b) )
@@ -74,26 +74,30 @@ and put it into the `core` library.  It's called `mul`, from
 So, to create a program to multiply two numbers, put the following into a
 file `hey.src`:
 
-    3 2 mul outnum
+    3 2 * outnum
     '\n' out
     halt
 
 Then, since we have a core library in tests/core.src, just load the library
 and concatenate the program above and pipe into the interpreter:
 
-    $ cat tests/core.src hey.src | ./sm -
+    $ cat tests/core.src hey.src | ./sm
     6
 
-I think I need to clarify that this project actually is *NOT* a joke.  It
-was made for fun, with the intention of creating a very simple stack machine
-interpreter with minimal syntax akin to Forth or PostScript.
+It's not a joke
+---------------
 
-The fact is that subroutines don't really exist, and neither does local
+I think I need to clarify that this project actually is not a joke.  Fun,
+yes, but a joke it's not.  I just wanted to create a simple virtual machine
+and from that I grew a language.  It's very similar to Forth and PostScript,
+and we all know those are extremely powerful (especially Forth).
+
+But the fact is that subroutines don't really exist, and neither does local
 variables, but they can be both be *implemented* with a bit of supporting
 code.
 
-Beside the fact that the machine has limited memory and stack, the language
-itself, as-is, is Turing complete.
+Although the machine and stack have limited memory, the language itself is
+Turing complete.
 
 Hello, world!
 -------------
