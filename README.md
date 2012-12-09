@@ -80,6 +80,8 @@ But I've implemented one for you in `tests/core.src`, with a function called
       &mul-res load
       popip
 
+Note that this function needs definitions for the functions `+` and `-1`.
+
 So, to create a program to multiply two numbers, put the following into a
 file `hey.src`:
 
@@ -92,6 +94,27 @@ main program:
 
     $ cat tests/core.src hey.src | ./sm
     6
+
+A complete program without the core dependency could be:
+
+    ; semi-obfuscated multiply and print
+
+    main:
+      12345 67890 * outnum
+      '\n' out
+      halt
+
+    *:
+      R: nop C: nop N: nop
+      &C stor dup &R stor &N stor
+
+      *-loop:
+        &R load &N load add &R stor
+        1 &C load sub &C stor
+        &C load &*-loop swap 1 swap sub jnz
+
+      &R load
+      popip
 
 It's not a joke
 ---------------
