@@ -416,7 +416,7 @@ Instruction set
 
 The instructions are found `include/instructions.hpp`:
 
-    VALUE   OPCODE  EXPLANATION
+    VALUE       OPCODE  EXPLANATION
     0x00000000  NOP     do nothing
     0x00000001  ADD     pop a, pop b, push a + b
     0x00000002  SUB     pop a, pop b, push a - b
