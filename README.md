@@ -140,16 +140,13 @@ Cutting to the chase, a program to print "Hello!" would be:
       ; stop program
       halt
 
-Notice the use of the `HALT` instruction to stop the program.  Earlier
-versions had no such operation.  Back then, an idiom to halt the machine was
-to just loop forever:
-
-    do-nothing: &do-nothing JMP
+Notice the use of the `HALT` instruction to stop the program.
 
 Multiplication and core library
 -------------------------------
 
-I've implemented a multiplication function in the core library in `tests/core.src`:
+I've implemented a multiplication function in the core library in
+`tests/core.src`:
 
     mul:            ; ( a b -- (a*b) )
       mul-res: nop  ; placeholder for result
@@ -187,28 +184,31 @@ I've implemented a multiplication function in the core library in `tests/core.sr
 
 Note that this function needs definitions for the functions `+` and `-1`.
 
-So, to create a program to multiply two numbers, put the following into a
-file `hey.src`:
+Recall the program to multiply two numbers.  Put the following in a file
+`hey.src`:
 
     3 2 * outnum
     '\n' out
     halt
 
-Since the core library is in `tests/core.src` we have to load if before the
-main program:
+If we concatenate the core library with our program, we get:
 
     $ cat tests/core.src hey.src | ./sm
     6
 
-A complete program without the core dependency could be:
+You could implement the whole program without depending on the core library:
 
     ; semi-obfuscated multiply and print
+    ; does not depend on any libraries
+
+    ; re-inventing the wheel can be very educational!
 
     main:
       12345 67890 * outnum
       '\n' out
       halt
 
+    ; multiplication function w/inner loop
     *:
       R: nop C: nop N: nop
       &C stor dup &R stor &N stor
@@ -221,22 +221,20 @@ A complete program without the core dependency could be:
       &R load
       popip
 
-(Implementing Karatsuba multiplication is left as an exercise for the reader.)
+While implementing the Karatsuba algorithm should be quite easy, Toom-Cook
+multiplication is left as an exercise for the reader.
 
 It's not a joke
 ---------------
 
-I think I need to clarify that this project actually is not a joke.  Fun,
-yes, but a joke it's not.  I just wanted to create a simple virtual machine
-and from that I grew a language.  It's very similar to Forth and PostScript,
-and we all know those are extremely powerful (especially Forth).
+I think I need to clarify that this project is actually not a joke.  Fun,
+absolutely, but not a joke.
 
-But the fact is that subroutines don't really exist, and neither does local
-variables, but they can be both be *implemented* with a bit of supporting
-code.
+I just wanted to create a simple virtual machine and from that I grew a
+language.  It's very similar to Forth and PostScript, and we all know those
+are extremely powerful --- particularly Forth!
 
-Although the machine and stack have limited memory, the language itself is
-Turing complete.
+Building stuff yourself is a powerful way of learning.
 
 A Fibonacci program
 -------------------
