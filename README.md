@@ -16,7 +16,8 @@ data and instruction stacks.
 
 The text and data regions are overlapped, so you can easily write
 self-modifying code (early versions actually required self-modification to
-be able to return from subroutine calls, just like Knuth's MIX).
+be able to return from subroutine calls, just like Knuth's MIX, but I've
+since taken liberty to add such modern convenience).
 
 There are two stacks; one for the instruction pointer and one for the data.
 They live separately from the text and data region, and are only limited by
