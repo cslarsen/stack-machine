@@ -56,15 +56,26 @@ function:
 Labels, addresses and their values
 ----------------------------------
 
-Labels are identifiers ending with a colon.  To put the _address_ of a label
-on the top of the data stack, just prepend the label name with an ampersand.
-If you want the _value_ of an address, use the `LOAD` instruction.
+Labels are identifiers ending with a colon.
 
-An idiom in this language is to create labels, putting a `NOP` ("no
-operation" or "do nothing" instruction) there and use that location to store
-variables.
+They refer to a particular cell in the machine, and you can access their
+position, value or execute code from that cell location:
 
-So, we could create a variable by doing so:
+    label:      ; create a label for the cell at this location
+    &label      ; put ADDRESS of label on top of stack
+    &label LOAD ; put VALUE of label's cell "label" on top-of-stack
+    label       ; EXECUTE code from label position
+
+So, to put the _address_ of a label on the top of the data stack, just
+prepend the label name with an ampersand.
+
+If you want the _value_ of an address, put the address on the TOS (top of
+stack) and use the `LOAD` instruction to replace the TOS with the value at
+the given cell location.
+
+An idiom for creating variables is to create labels and putting a `NOP` at
+that location to reserve one memory cell to hold variables.  An example of
+using a counter variable to implement a loop is given below.
 
     counter: NOP                     ; reserve 1 word for the variable "counter"
 
