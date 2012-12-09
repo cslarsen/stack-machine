@@ -333,14 +333,18 @@ Secondly, I've added a `POPIP` instruction along with automatically storing
 the next instruction before performing a jump.  This effectively let's you
 call and return from subroutines:
 
+    boot:
+      &main jmp halt
+
     foo: bar: baz:
       '\n' '!' 'e' 'c' 'i' 'u' 'j' 'e' 'l' 't' 'e' 'e' 'B'
-      out out out out out out out out out out out
+      out out out out out out out out out out out out out
       popip
 
-    foo bar baz ; call thrice
+    main:
+      foo bar baz
 
-Thirdly, I never bothered to write my own print number function, because it
+Third, I never bothered to write my own print number function, because it
 would require me to write both division and modulus functions in source
 first.  So I implemented `OUTNUM` that prints a number to the output:
 
