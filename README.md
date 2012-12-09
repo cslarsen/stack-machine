@@ -87,8 +87,8 @@ you can return from a function call by using the instruction `POPIP`:
       '\n' OUT
       POPIP     ; return from "function"
 
-Variables
----------
+Variables and subroutines
+-------------------------
 
 An idiom for creating variables is to create labels and putting a `NOP` at
 that location to reserve one memory cell to hold variables.  An example of
@@ -114,25 +114,6 @@ The output of the above program is three stars:
 
 You can forward-reference labels.  In fact, another idiom is to jump to the
 main part of the program at the start of the source.
-
-Subroutines
------------
-
-If you reference a label without the ampersand, the virtual machine will
-execute the code at that location.  Before changing the instruction pointer,
-the next address will be placed on the top of the instruction stack.  You
-can therefore use `POPIP` to pop this number off the stack and assign it to
-the current instruction pointer.  
-
-In other words, `POPIP` returns from a subroutine.  Or whatever.
-
-So, in the above example, we could create a subroutine `decrement-counter`
-like so:
-
-    decrement-counter:  &counter LOAD   ; read variable
-                        1 SWAP SUB      ; decrement value
-                        &counter STOR   ; update variable
-                        POPIP           ; return from "subroutine"
 
 Hello, world!
 -------------
