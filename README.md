@@ -4,7 +4,7 @@ Stack-Machine
 This project contains
 
   * A simple, stack-based virtual machine for executing low-level instructions
-  * An assembler supporting a Forth/PostScript-like language
+  * An assembler supporting a Forth / PostScript like language
   * An interpreter able to run compiled programs
 
 The instructions are fixed-width at 32-bits and so are the arithmetic
