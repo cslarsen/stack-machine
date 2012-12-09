@@ -1,6 +1,6 @@
 CC = g++
 CXX = g++
-CXXFLAGS = -Wall -Weffc++ -g -Iinclude
+CXXFLAGS = -g -W -Wall -Weffc++ -Iinclude
 TARGETS = instructions.o parser.o error.o upper.o fileptr.o machine.o compiler.o sm.o smr.o smc.o smd.o sm smr smc smd
 
 
