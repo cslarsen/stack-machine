@@ -60,8 +60,9 @@ Labels are identifiers ending with a colon.  To put the _address_ of a label
 on the top of the data stack, just prepend the label name with an ampersand.
 If you want the _value_ of an address, use the `LOAD` instruction.
 
-An idiom in this language is to create labels, put a `NOP` ("no operation"
-instruction) there and use that location to store variables.
+An idiom in this language is to create labels, putting a `NOP` ("no
+operation" or "do nothing" instruction) there and use that location to store
+variables.
 
 So, we could create a variable by doing so:
 
