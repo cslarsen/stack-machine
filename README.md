@@ -73,6 +73,27 @@ If you want the _value_ of an address, put the address on the TOS (top of
 stack) and use the `LOAD` instruction to replace the TOS with the value at
 the given cell location.
 
+When executing code at a given label position, the machine first puts the
+address of the next instruction on top of the instruction stack.  This way
+you can return from a function call by using the instruction `POPIP`:
+
+    main:
+      print-dot
+      print-dot
+      HALT
+
+    print-dot:
+       '.' OUT
+      '\n' OUT
+         POPIP ; return
+
+When executing code at a given label position, the machine will first put
+the pointer to the _next_ instruction on top of the instruction stack the
+pointer to the next instruction 
+
+Variables
+---------
+
 An idiom for creating variables is to create labels and putting a `NOP` at
 that location to reserve one memory cell to hold variables.  An example of
 using a counter variable to implement a loop is given below.
