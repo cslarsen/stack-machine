@@ -46,11 +46,100 @@ To multiply them, just append with an asterix:
     3 2 * ; multiplication
 
 This operation pops the topmost two numbers on the stack and replaces them
-with the result of the multiplication.
+with the result of the multiplication.  To run such a program, you'd need to
+include the core library first, since multiplication is defined as a
+function:
 
-Except, there is no multiplication function available in the core language.
-But I've implemented one for you in `tests/core.src`, with a function called
-`mul` (aliased to `*`):
+    $ cat tests/core.src your-file.src | sm
+    6
+
+Labels, addresses and their values
+----------------------------------
+
+Labels are identifiers ending with a colon.  To put the _address_ of a label
+on the top of the data stack, just prepend the label name with an ampersand.
+If you want the _value_ of an address, use the `LOAD` instruction.
+
+An idiom in this language is to create labels, put a `NOP` ("no operation"
+instruction) there and use that location to store variables.
+
+So, we could create a variable by doing so:
+
+    counter: NOP                     ; reserve 1 word for the variable "counter"
+
+    program: 2 &counter STOR                       ; set counter to two
+             &counter LOAD 1 ADD &counter STOR     ; increment counter by one
+
+    ; loop counter+1 times
+
+    display: '\n' '*' OUT OUT                      ; print an asterix
+             1 &counter LOAD SUB &counter STOR     ; decrement counter by one
+             &display &counter LOAD JNZ            ; jump to display if not zero
+
+The output of the above program is three stars:
+
+    $ ./sm foo.src
+    *
+    *
+    *
+
+You can forward-reference labels.  In fact, another idiom is to jump to the
+main part of the program at the start of the source.
+
+Subroutines
+-----------
+
+If you reference a label without the ampersand, the virtual machine will
+execute the code at that location.  Before changing the instruction pointer,
+the next address will be placed on the top of the instruction stack.  You
+can therefore use `POPIP` to pop this number off the stack and assign it to
+the current instruction pointer.  
+
+In other words, `POPIP` returns from a subroutine.  Or whatever.
+
+So, in the above example, we could create a subroutine `decrement-counter`
+like so:
+
+    decrement-counter:  &counter LOAD   ; read variable
+                        1 SWAP SUB      ; decrement value
+                        &counter STOR   ; update variable
+                        POPIP           ; return from "subroutine"
+
+Hello, world!
+-------------
+
+You can do `72 OUT` to print the letter "H" (72 is the ASCII code for "H").
+Cutting to the chase, a program to print "Hello!" would be:
+
+    ; Labels are written as a name without whitespace
+    ; and a colon at the end.
+
+    main:
+       72 out          ; "H"
+      101 out          ; "e"
+      108 dup out out  ; "ll"
+      111 out          ; "o"
+       33 out          ; "!"
+
+      ; newline
+      '\n' out
+
+      42 outnum     ; print a number
+      '\n' out      ; and newline
+
+      ; stop program
+      halt
+
+Notice the use of the `HALT` instruction to stop the program.  Earlier
+versions had no such operation.  Back then, an idiom to halt the machine was
+to just loop forever:
+
+    do-nothing: &do-nothing JMP
+
+Multiplication and core library
+-------------------------------
+
+I've implemented a multiplication function in the core library in `tests/core.src`:
 
     mul:            ; ( a b -- (a*b) )
       mul-res: nop  ; placeholder for result
@@ -78,6 +167,12 @@ But I've implemented one for you in `tests/core.src`, with a function called
         &mul-loop swap -1 jnz
 
       &mul-res load
+      popip
+
+    ; ...
+
+    *:        ; alias for mul
+      mul
       popip
 
 Note that this function needs definitions for the functions `+` and `-1`.
@@ -132,89 +227,6 @@ code.
 
 Although the machine and stack have limited memory, the language itself is
 Turing complete.
-
-Hello, world!
--------------
-
-You can do `72 OUT` to print the letter "H" (72 is the ASCII code for "H").
-Cutting to the chase, a program to print "Hello!" would be:
-
-    ; Labels are written as a name without whitespace
-    ; and a colon at the end.
-
-    main:
-       72 out          ; "H"
-      101 out          ; "e"
-      108 dup out out  ; "ll"
-      111 out          ; "o"
-       33 out          ; "!"
-
-      ; newline
-      '\n' out
-
-      42 outnum     ; print a number
-      '\n' out      ; and newline
-
-      ; stop program
-      halt
-
-Notice the use of the `HALT` instruction to stop the program.  Earlier
-versions had no such operation.  Back then, an idiom to halt the machine was
-to just loop forever:
-
-    do-nothing: &do-nothing JMP
-
-Labels, addresses and their values
-----------------------------------
-
-Labels are identifiers ending with a colon.  To put the _address_ of a label
-on the top of the data stack, just prepend the label name with an ampersand.
-If you want the _value_ of an address, use the `LOAD` instruction.
-
-An idiom in this language is to create labels, put a `NOP` ("no operation"
-instruction) there and use that location to store variables.
-
-So, we could create a variable by doing so:
-
-    counter: NOP                     ; reserve 1 word for the variable "counter"
-
-    program: 2 &counter STOR                       ; set counter to two
-             &counter LOAD 1 ADD &counter STOR     ; increment counter by one
-
-    ; loop counter+1 times
-
-    display: '\n' '*' OUT OUT                      ; print an asterix
-             1 &counter LOAD SUB &counter STOR     ; decrement counter by one
-             &display &counter LOAD JNZ            ; jump to display if not zero
-
-The output of the above program is three stars:
-
-    $ ./sm foo.src
-    *
-    *
-    *
-
-You can forward-reference labels.  In fact, another idiom is to jump to the
-main part of the program at the start of the source.
-
-Subroutines
------------
-
-If you reference a label without the ampersand, the virtual machine will
-execute the code at that location.  Before changing the instruction pointer,
-the next address will be placed on the top of the instruction stack.  You
-can therefore use `POPIP` to pop this number off the stack and assign it to
-the current instruction pointer.  
-
-In other words, `POPIP` returns from a subroutine.  Or whatever.
-
-So, in the above example, we could create a subroutine `decrement-counter`
-like so:
-
-    decrement-counter:  &counter LOAD   ; read variable
-                        1 SWAP SUB      ; decrement value
-                        &counter STOR   ; update variable
-                        POPIP           ; return from "subroutine"
 
 A Fibonacci program
 -------------------
