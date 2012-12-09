@@ -1,1 +1,5 @@
-*.o sm smc smd smr
+*.o
+sm
+smc
+smd
+smr
