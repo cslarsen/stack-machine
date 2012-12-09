@@ -43,37 +43,6 @@ with.  You can benefit from it by reading the source code, playing with a
 language similar to Forth, but conceptually simpler, and finally by seeing
 how easy it is to build your own system.
 
-Instruction set
----------------
-
-The instructions are found `include/instructions.hpp`:
-
-    NOP,  // do nothing
-    ADD,  // pop a, pop b, push a + b
-    SUB,  // pop a, pop b, push a - b
-    AND,  // pop a, pop b, push a & b
-    OR,   // pop a, pop b, push a | b
-    XOR,  // pop a, pop b, push a ^ b
-    NOT,  // pop a, push !a
-    IN,   // push one byte read from stream
-    OUT,  // pop one byte and write to stream
-    LOAD, // pop a, push byte read from address a
-    STOR, // pop a, pop b, write b to address a
-    JMP,  // pop a, goto a
-    JZ,   // pop a, pop b, if a == 0 goto b
-    PUSH, // push next word
-    DUP,  // duplicate word on stack
-    SWAP, // swap top two words on stack
-    ROL3, // rotate top three words on stack once left, (a b c) -> (b c a)
-    OUTNUM, // pop one byte and write to stream as number
-    JNZ,  // pop a, pop b, if a != 0 goto b
-    DROP, // remove top of stack
-    PUSHIP, // push a in IP stack
-    POPIP,  // pop IP stack to current IP, effectively performing a jump
-    DROPIP, // pop IP, but do not jump
-    COMPL,  // pop a, push the complement of a
-    NOP_END // placeholder for end of enum; MUST BE LAST
-
 The programming language
 ========================
 
@@ -441,6 +410,43 @@ actively playing with it.
 Although the interpreter is slow, it should be possible to convert stack
 operations to a register machine.  In fact, it should be trivial to compile
 programs to native machine code, e.g. x86.
+
+Instruction set
+---------------
+
+The instructions are found `include/instructions.hpp`:
+
+    Value   Opcode  Explanation
+    ----------------------------------------------------------------------
+    0x0000  NOP     do nothing
+    0x0001  ADD     pop a, pop b, push a + b
+    0x0002  SUB     pop a, pop b, push a - b
+    0x0003  AND     pop a, pop b, push a & b
+    0x0004  OR      pop a, pop b, push a | b
+    0x0005  XOR     pop a, pop b, push a ^ b
+    0x0006  NOT     pop a, push !a
+    0x0007  IN      read one byte from stdin, push as word on stack
+    0x0008  OUT     pop one word and write to stream as one byte
+    0x0009  LOAD    pop a, push word read from address a
+    0x000A  STOR    pop a, pop b, write b to address a
+    0x000B  JMP     pop a, goto a
+    0x000C  JZ      pop a, pop b, if a == 0 goto b
+    0x000D  PUSH    push next word
+    0x000E  DUP     duplicate word on stack
+    0x000F  SWAP    swap top two words on stack
+    0x0010  ROL3    rotate top three words on stack once left, (a b c) -> (b c a)
+    0x0011  OUTNUM  pop one word and write to stream as number
+    0x0012  JNZ     pop a, pop b, if a != 0 goto b
+    0x0013  DROP    remove top of stack
+    0x0014  PUSHIP  push a in IP stack
+    0x0015  POPIP   pop IP stack to current IP, effectively performing a jump
+    0x0016  DROPIP  pop IP, but do not jump
+    0x0017  COMPL   pop a, push the complement of a
+
+The instruction set could easily be more minimal, even more so if we allowed
+registers.  Also, we have taken absolutely no care about the machine code
+values for each instruction.  A good design would do something cool with
+that.
 
 License and author
 ==================
