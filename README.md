@@ -87,10 +87,6 @@ you can return from a function call by using the instruction `POPIP`:
       '\n' OUT
       POPIP     ; return from "function"
 
-When executing code at a given label position, the machine will first put
-the pointer to the _next_ instruction on top of the instruction stack the
-pointer to the next instruction 
-
 Variables
 ---------
 
