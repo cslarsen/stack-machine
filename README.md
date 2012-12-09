@@ -44,13 +44,11 @@ To multiply them, just append with an asterix:
     3 2 * ; multiplication
 
 This operation pops the topmost two numbers on the stack and replaces them
-with the result of the multiplication.  Also, comments are introduced with
-semicolons.
+with the result of the multiplication.
 
-Well, except --- there really is no multiplication instruction.  But it's
-fairly easy to create one.  I've actually bothered to create one for you and
-put it into the `core` library.  It's called `mul` / `*`, from
-`tests/core.src`:
+Except, there is no multiplication function available in the core language.
+But I've implemented one for you in `tests/core.src`, with a function called
+`mul` (aliased to `*`):
 
     mul:            ; ( a b -- (a*b) )
       mul-res: nop  ; placeholder for result
@@ -87,8 +85,8 @@ file `hey.src`:
     '\n' out
     halt
 
-Then, since we have a core library in tests/core.src, just load the library
-and concatenate the program above and pipe into the interpreter:
+Since the core library is in `tests/core.src` we have to load if before the
+main program:
 
     $ cat tests/core.src hey.src | ./sm
     6
