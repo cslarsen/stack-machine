@@ -116,6 +116,8 @@ A complete program without the core dependency could be:
       &R load
       popip
 
+(Implementing Karatsuba multiplication is left as an exercise for the reader.)
+
 It's not a joke
 ---------------
 
