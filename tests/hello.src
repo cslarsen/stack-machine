@@ -1,12 +1,7 @@
-; labels are written as a name without whitespace
-; and a colon at the end
-
-; jumping to labels is not yet supported by the
-; assembler
+; Labels are written as a name without whitespace
+ and a colon at the end
 
 main:
-  ; this is a comment
-
    72 out          ; "H"
   101 out          ; "e"
   108 dup out out  ; "ll"
@@ -16,7 +11,7 @@ main:
   ; newline
   10 13 out out
 
-  42 outnum     ; print number
+  42 outnum     ; print a number
   10 13 out out ; ... and CRLF
 
   ; stop program
