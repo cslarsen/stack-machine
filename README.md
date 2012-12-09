@@ -22,6 +22,13 @@ There are two stacks; one for the instruction pointer and one for the data.
 They live separately from the text and data region, and are only limited by
 the host process heap size.
 
+The machine contains no special facilities besides this:  It's inherently
+single-threaded and has absolutely no concept of execution protection
+(though, it's fairly well sandboxed from your host system).
+
+The project aim was to create a simple machine and language to play around
+with.
+
 The programming language
 ========================
 
