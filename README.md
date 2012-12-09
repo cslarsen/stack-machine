@@ -77,15 +77,15 @@ When executing code at a given label position, the machine first puts the
 address of the next instruction on top of the instruction stack.  This way
 you can return from a function call by using the instruction `POPIP`:
 
-    main:
+    main:       ; program start
       print-dot
       print-dot
       HALT
 
     print-dot:
-       '.' OUT
+      '.' OUT
       '\n' OUT
-         POPIP ; return
+      POPIP     ; return from "function"
 
 When executing code at a given label position, the machine will first put
 the pointer to the _next_ instruction on top of the instruction stack the
