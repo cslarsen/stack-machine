@@ -291,6 +291,39 @@ from `tests/fib.src`:
         ; decrement, loop if non-zero
         count-dec &loop jump-if-nonzero
 
+Convenience features
+--------------------
+
+I've added a `HALT` instruction.  This replaces the old idiom of looping
+forever to signal that a program was finished:
+
+    stop: stop      ; form 1
+    stop: &stop jmp ; form 2
+    halt            ; convenience form
+
+Originally, it was an argument of minimalism for not including any halt
+instructions.
+
+Secondly, I've added a `POPIP` instruction along with automatically storing
+the next instruction before performing a jump.  This effectively let's you
+call and return from subroutines:
+
+    foo: bar: baz:
+      '\n' '!' 'e' 'c' 'i' 'u' 'j' 'e' 'l' 't' 'e' 'e' 'B'
+      out out out out out out out out out out out
+      popip
+
+    foo bar baz ; call thrice
+
+Thirdly, I never bothered to write my own print number function, because it
+would require me to write both division and modulus functions in source
+first.  So I implemented `OUTNUM` that prints a number to the output:
+
+    123 OUTNUM '\n' OUT ; prints "123\n"
+
+Lacking is proper string handling.  One could say that string handling is
+not this language's strongest point.
+
 Instruction set
 ---------------
 
