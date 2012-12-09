@@ -14,9 +14,9 @@ By default, programs have 1 million cells available for both program text
 and data.  This means that a virtual machine memory takes up 4MB plus the
 data and instruction stacks.
 
-The text and data regions are overlapped, so you easily write self-modifying
-code (early versions actually required self-modification to be able to
-return from subroutine calls, just like Knuth's MIX).
+The text and data regions are overlapped, so you can easily write
+self-modifying code (early versions actually required self-modification to
+be able to return from subroutine calls, just like Knuth's MIX).
 
 There are two stacks; one for the instruction pointer and one for the data.
 They live separately from the text and data region, and are only limited by
