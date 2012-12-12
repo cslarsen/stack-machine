@@ -1,5 +1,5 @@
 ; Labels are written as a name without whitespace
- and a colon at the end
+; and a colon at the end
 
 main:
    72 out          ; "H"

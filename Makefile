@@ -19,16 +19,11 @@ smd: instructions.o machine.o upper.o error.o fileptr.o smd.o
 sm: instructions.o machine.o upper.o error.o fileptr.o parser.o compiler.o sm.o
 
 check: all
-	./smc tests/hello-world.txt
-	./smd tests/hello-world.sm
-	./sm tests/hello-world.sm
-	./sm tests/fib.sm | head -20
-	./smc tests/hello.src
-	./smr tests/hello.sm
-	./smc tests/hello-world.txt
-	./smr tests/hello-world.sm
+	./sm tests/fib.src
 	./smc tests/fib.src
 	./smr tests/fib.sm
+	./smc tests/hello.src
+	./smr tests/hello.sm
 	./smc tests/forward-goto.src
 	./smr tests/forward-goto.sm
 	./sm tests/yo.src
