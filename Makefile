@@ -1,8 +1,7 @@
-CXX = g++
-CC = $(CXX)
 CXXFLAGS = -g -W -Wall -Weffc++ -Iinclude
-TARGETS = instructions.o parser.o error.o upper.o fileptr.o machine.o compiler.o sm.o smr.o smc.o smd.o sm smr smc smd
+LINK.o = $(LINK.cc)
 
+TARGETS = instructions.o parser.o error.o upper.o fileptr.o machine.o compiler.o sm.o smr.o smc.o smd.o sm smr smc smd
 
 all: $(TARGETS)
 	@echo Run \"make check\" to test package
