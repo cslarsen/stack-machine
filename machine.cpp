@@ -585,7 +585,7 @@ int32_t machine_t::pos() const
   return ip;
 }
 
-void machine_t::addlabel(const char* name, int32_t pos, int lineno)
+void machine_t::addlabel(const char* name, int32_t pos, int)
 {
   std::string n = upper(name);
 

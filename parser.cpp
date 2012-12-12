@@ -33,7 +33,8 @@ void parser::move_back(int c)
 void parser::skip_whitespace()
 {
   int c;
-  while ( (c = fgetchar()) != EOF && isspace(c) );
+  while ( (c = fgetchar()) != EOF && isspace(c) )
+    ;
   move_back(c);
 }
 
@@ -64,5 +65,6 @@ std::string parser::next_token()
 void parser::skip_line()
 {
   int c;
-  while ( (c = fgetchar()) != EOF && c != '\n' );
+  while ( (c = fgetchar()) != EOF && c != '\n' )
+    ;
 }
