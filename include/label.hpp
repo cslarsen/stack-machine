@@ -6,6 +6,7 @@
  *
  */
 
+#include <stdlib.h>
 #include <string>
 
 #ifndef INC_LABEL_HPP
