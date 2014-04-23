@@ -6,6 +6,7 @@
  *
  */
 
+#include <stdio.h>
 #include <ctype.h>
 #include "parser.hpp"
 
