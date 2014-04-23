@@ -52,7 +52,7 @@ int main(int argc, char** argv)
         compile(stdin, "out.sm");
       } else {
         file = argv[n];
-        compile(fileptr(fopen(argv[n], "rt")), basename(argv[n]) + ".sm");
+        compile(fileptr(fopen(file, "rt")), basename(file) + std::string(".sm"));
       }
     }
 

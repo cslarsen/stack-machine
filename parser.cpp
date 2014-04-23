@@ -7,6 +7,8 @@
  */
 
 #include <ctype.h>
+#include <stdio.h>
+
 #include "parser.hpp"
 
 int parser::update_lineno(int c)
