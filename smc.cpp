@@ -20,10 +20,12 @@
 const char* file = "";
 parser *p = NULL;
 
-std::string basename(const std::string& s)
+// Return '<this part>.<ext>' of a filename
+static std::string sbasename(const std::string& s)
 {
-  std::string::size_type p = s.rfind('.');
-  return p <= 0 ? s : s.substr(0, p);
+  using namespace std;
+  const string::size_type p = s.rfind('.');
+  return p == string::npos ? s : s.substr(0, p);
 }
 
 static void compile_error(const char* msg)
@@ -52,7 +54,8 @@ int main(int argc, char** argv)
         compile(stdin, "out.sm");
       } else {
         file = argv[n];
-        compile(fileptr(fopen(argv[n], "rt")), basename(argv[n]) + ".sm");
+        compile(fileptr(fopen(argv[n], "rt")),
+                sbasename(argv[n]) + ".sm");
       }
     }
 
