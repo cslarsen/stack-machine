@@ -4,8 +4,8 @@ Stack-Machine
 This project contains
 
   * A simple, stack-based virtual machine for executing low-level instructions
-  * An assembler supporting a Forth / PostScript like language
-  * An interpreter able to run compiled programs
+  * An Assembler supporting a Forth / PostScript like language
+  * An Interpreter able to run compiled programs
 
 Architecture and design
 -----------------------
